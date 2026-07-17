@@ -216,7 +216,10 @@
     background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:2px 6px;border-radius:6px;
   }
   button.del:hover{color:var(--critical);background:#fbecec}
-  :root[data-theme="dark"] button.del:hover, @media (prefers-color-scheme:dark){button.del:hover{background:rgba(230,103,103,.15)}}
+  :root[data-theme="dark"] button.del:hover{background:rgba(230,103,103,.15)}
+  @media (prefers-color-scheme:dark){
+    :root:where(:not([data-theme="light"])) button.del:hover{background:rgba(230,103,103,.15)}
+  }
   table{width:100%;border-collapse:collapse;font-size:14px}
   th{text-align:left;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;padding:8px 10px;border-bottom:1px solid var(--grid)}
   td{padding:8px 10px;border-bottom:1px solid var(--grid);font-variant-numeric:tabular-nums}
@@ -492,7 +495,7 @@
           <select id="pSexe"><option value="">—</option><option value="F">Femme</option><option value="H">Homme</option></select>
         </div>
         <div class="field"><label for="pTaille">Taille (cm)</label><input type="number" id="pTaille" min="100" max="230" placeholder="165"></div>
-        <div class="field"><label for="pNaissance">Année de naissance</label><input type="number" id="pNaissance" min="1920" max="2015" placeholder="1985"></div>
+        <div class="field"><label for="pNaissance">Année de naissance</label><input type="number" id="pNaissance" min="1920" placeholder="1985"></div>
       </div>
       <div class="inline" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-top:12px">
         <div class="field"><label for="pDepart">Poids de départ (kg)</label><input type="number" id="pDepart" step="0.1" min="20" max="350"></div>
@@ -532,12 +535,8 @@
       « Ajouter à l'écran d'accueil » / « Installer l'application ».<br>
       <strong>iPhone (Safari) :</strong> appuyez sur le bouton Partager 􀈂 puis « Sur l'écran d'accueil ».<br>
       Une fois installée, l'application s'ouvre en plein écran comme une vraie appli, avec son icône.
+      Pensez à sauvegarder régulièrement vos données dans l'onglet <strong>💾 Sauvegarde</strong>.
     </p>
-  </div>
-
-  <div class="panel">
-    <h3>💾 Sauvegarder mes données</h3>
-    <p style="font-size:13.5px;color:var(--ink-2)">Rendez-vous dans l'onglet <strong>💾 Sauvegarde</strong> pour exporter ou importer vos données.</p>
   </div>
 </section>
 
@@ -834,17 +833,26 @@ function weeklyRate(){
   if(days<=0) return null;
   return (last.poids-ref.poids)/days*7;
 }
-/* Alerte de conformité PP/PL : légume noté un jour protéines pures */
-function complianceWarning(dateStr){
+/* Alertes de conformité Dukan : légume un jour PP, ou plus de 2 aliments "tolérés" dans la journée */
+function complianceWarnings(dateStr){
+  const warnings=[];
   const dt=dayType(dateStr);
-  if(!dt || !dt.startsWith("PP")) return null;
   const entries=state.journal[dateStr]||[];
-  const veggies=entries.filter(e=>{
-    const f=FOODS.find(f=>f.n.toLowerCase()===e.aliment.toLowerCase());
-    return f && f.p===2;
-  });
-  if(!veggies.length) return null;
-  return "⚠️ Jour protéines pures (PP), mais légume(s) noté(s) : "+veggies.map(v=>escapeHtml(v.aliment)).join(", ");
+  if(dt && dt.startsWith("PP")){
+    const veggies=entries.filter(e=>{
+      const f=FOODS.find(f=>f.n.toLowerCase()===e.aliment.toLowerCase());
+      return f && f.p===2;
+    });
+    if(veggies.length) warnings.push("⚠️ Jour protéines pures (PP), mais légume(s) noté(s) : "+veggies.map(v=>escapeHtml(v.aliment)).join(", "));
+  }
+  if(state.profile.phase>=2){
+    const toleres=entries.filter(e=>{
+      const f=FOODS.find(f=>f.n.toLowerCase()===e.aliment.toLowerCase());
+      return f && f.p===3;
+    });
+    if(toleres.length>2) warnings.push("⚠️ "+toleres.length+" aliments « tolérés » notés aujourd'hui (max recommandé : 2/jour) : "+toleres.map(v=>escapeHtml(v.aliment)).join(", "));
+  }
+  return warnings;
 }
 
 /* ═══════════════════ NAVIGATION ═══════════════════ */
@@ -1166,9 +1174,9 @@ function renderJournal(){
   document.getElementById("jDate").value=journalDate;
   renderWater();
   const warnEl=document.getElementById("journalWarn");
-  const warn=complianceWarning(journalDate);
-  warnEl.style.display=warn?"block":"none";
-  if(warn) warnEl.innerHTML=warn;
+  const warnings=complianceWarnings(journalDate);
+  warnEl.style.display=warnings.length?"block":"none";
+  if(warnings.length) warnEl.innerHTML=warnings.join("<br>");
   const entries=state.journal[journalDate]||[];
   const REPAS=["Petit-déjeuner","Déjeuner","Collation","Dîner"];
   let html="";
@@ -1408,6 +1416,7 @@ function renderAliments(){
 }
 
 /* ═══════════════════ PAGE PROFIL ═══════════════════ */
+document.getElementById("pNaissance").max = new Date().getFullYear()-10;
 function fillProfil(){
   const p=state.profile;
   document.getElementById("pNom").value=p.nom||"";
