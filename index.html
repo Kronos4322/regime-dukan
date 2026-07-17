@@ -948,17 +948,17 @@ function weeklyRate(){
   if(days<=0) return null;
   return (last.poids-ref.poids)/days*7;
 }
-/* Alertes de conformité Dukan : légume un jour PP, ou plus de 2 aliments "tolérés" dans la journée */
+/* Alertes de conformité Dukan : aliment non protéiné un jour PP, plus de 2 aliments "tolérés", ou aliment habituellement déconseillé */
 function complianceWarnings(dateStr){
   const warnings=[];
   const dt=dayType(dateStr);
   const entries=state.journal[dateStr]||[];
   if(dt && dt.startsWith("PP")){
-    const veggies=entries.filter(e=>{
+    const nonPP=entries.filter(e=>{
       const f=FOODS.find(f=>f.n.toLowerCase()===e.aliment.toLowerCase());
-      return f && f.p===2;
+      return f && (f.p===2||f.p===4);
     });
-    if(veggies.length) warnings.push("⚠️ Jour protéines pures (PP), mais légume(s) noté(s) : "+veggies.map(v=>escapeHtml(v.aliment)).join(", "));
+    if(nonPP.length) warnings.push("⚠️ Jour protéines pures (PP), mais aliment(s) non protéiné(s) noté(s) : "+nonPP.map(v=>escapeHtml(v.aliment)).join(", "));
   }
   if(state.profile.phase>=2){
     const toleres=entries.filter(e=>{
@@ -967,6 +967,8 @@ function complianceWarnings(dateStr){
     });
     if(toleres.length>2) warnings.push("⚠️ "+toleres.length+" aliments « tolérés » notés aujourd'hui (max recommandé : 2/jour) : "+toleres.map(v=>escapeHtml(v.aliment)).join(", "));
   }
+  const forbidden=entries.filter(e=>FORBIDDEN.some(f=>f.n.toLowerCase()===e.aliment.toLowerCase()));
+  if(forbidden.length) warnings.push("🚫 Aliment(s) habituellement déconseillé(s) dans le Dukan : "+forbidden.map(v=>escapeHtml(v.aliment)).join(", "));
   return warnings;
 }
 
@@ -1527,16 +1529,20 @@ function renderSport(){
   renderSteps();
   // stats semaine
   const mon=mondayOf(todayStr());
+  const weekDates=[...Array(7)].map((_,i)=>addDays(mon,i));
   const week=state.sports.filter(s=>s.date>=mon&&s.date<=addDays(mon,6));
   const wMin=week.reduce((s,e)=>s+(+e.duree||0),0);
-  const wK=week.reduce((s,e)=>s+(+e.kcal||0),0);
+  const wSteps=weekDates.reduce((s,d)=>s+stepsCount(d),0);
+  const wK=week.reduce((s,e)=>s+(+e.kcal||0),0)+weekDates.reduce((s,d)=>s+stepsKcal(d),0);
   const month=todayStr().slice(0,7);
   const mAll=state.sports.filter(s=>s.date.startsWith(month));
+  const mStepsDates=Object.keys(state.steps).filter(d=>d.startsWith(month));
   const mMin=mAll.reduce((s,e)=>s+(+e.duree||0),0);
-  const mK=mAll.reduce((s,e)=>s+(+e.kcal||0),0);
+  const mK=mAll.reduce((s,e)=>s+(+e.kcal||0),0)+mStepsDates.reduce((s,d)=>s+stepsKcal(d),0);
   document.getElementById("sportCards").innerHTML=`
-    <div class="card"><div class="label">Cette semaine</div><div class="value">${wMin} <small>min</small></div><div class="sub">🔥 ${wK} kcal brûlées</div></div>
-    <div class="card"><div class="label">Ce mois-ci</div><div class="value">${mMin} <small>min</small></div><div class="sub">🔥 ${mK} kcal brûlées</div></div>
+    <div class="card"><div class="label">Cette semaine</div><div class="value">${wMin} <small>min</small></div><div class="sub">🔥 ${wK} kcal brûlées (sport + pas)</div></div>
+    <div class="card"><div class="label">Pas cette semaine</div><div class="value">${wSteps.toLocaleString("fr-FR")}</div><div class="sub">${Math.round(wSteps/7).toLocaleString("fr-FR")} pas/jour en moyenne</div></div>
+    <div class="card"><div class="label">Ce mois-ci</div><div class="value">${mMin} <small>min</small></div><div class="sub">🔥 ${mK} kcal brûlées (sport + pas)</div></div>
     <div class="card"><div class="label">Séances ce mois-ci</div><div class="value">${mAll.length}</div></div>
     <div class="card"><div class="label">Rappel Dukan</div><div class="value" style="font-size:16px;line-height:1.3">🚶 Marche quotidienne obligatoire</div>
       <div class="sub">${state.profile.phase===1?"20 min (Attaque)":state.profile.phase===2?"30 min (Croisière)":state.profile.phase===3?"25 min (Consolidation)":"20 min par jour"}</div></div>`;
