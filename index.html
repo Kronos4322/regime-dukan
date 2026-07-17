@@ -161,6 +161,10 @@
     content:"";position:absolute;top:3px;width:4px;height:4px;border-radius:50%;background:var(--accent);
   }
   .bottom-nav .nav-btn:active{transform:scale(.92)}
+  .nav-dot{display:none;width:7px;height:7px;border-radius:50%;background:var(--critical)}
+  .nav-dot.show{display:inline-block}
+  .top-nav .nav-btn .nav-dot{margin-left:4px;vertical-align:top}
+  .bottom-nav .nav-btn .nav-dot{position:absolute;top:6px;right:26%}
 
   @media (max-width:768px){
     .top-nav{display:none}
@@ -320,6 +324,7 @@
   <button class="nav-btn" data-page="sport">🏃 Sport</button>
   <button class="nav-btn" data-page="aliments">🥗 Aliments Dukan</button>
   <button class="nav-btn" data-page="profil">⚙️ Profil</button>
+  <button class="nav-btn" data-page="sauvegarde">💾 Sauvegarde<span class="nav-dot" id="backupDotTop"></span></button>
 </nav>
 
 <main>
@@ -531,16 +536,41 @@
   </div>
 
   <div class="panel">
-    <h3>💾 Mes données</h3>
-    <div class="warn-banner" id="backupReminder" style="display:none;margin-bottom:12px"></div>
-    <p style="font-size:13.5px;color:var(--ink-2);margin-bottom:12px">
-      Vos données sont enregistrées automatiquement dans ce navigateur. Pensez à faire une sauvegarde régulière.
+    <h3>💾 Sauvegarder mes données</h3>
+    <p style="font-size:13.5px;color:var(--ink-2)">Rendez-vous dans l'onglet <strong>💾 Sauvegarde</strong> pour exporter ou importer vos données.</p>
+  </div>
+</section>
+
+<!-- ══════════ SAUVEGARDE ══════════ -->
+<section class="page" id="page-sauvegarde">
+  <div class="warn-banner" id="backupReminder" style="display:none"></div>
+
+  <div class="panel">
+    <h3>💾 Pourquoi sauvegarder ?</h3>
+    <p style="font-size:13.5px;color:var(--ink-2);line-height:1.6">
+      Toutes vos données (poids, repas, menus, sport) sont enregistrées <strong>uniquement dans ce navigateur, sur cet appareil</strong> —
+      rien n'est envoyé sur un serveur. Si vous changez de téléphone, videz le cache, désinstallez l'application ou utilisez
+      un autre navigateur, ces données <strong>ne vous suivront pas</strong> automatiquement. Exportez régulièrement une
+      sauvegarde et gardez-la en lieu sûr (boîte mail, Drive, stockage cloud) pour ne jamais rien perdre.
     </p>
+  </div>
+
+  <div class="panel">
+    <h3>📊 Vos données actuelles</h3>
+    <div id="backupSummary"></div>
+    <p style="font-size:12.5px;color:var(--muted);margin-top:10px" id="lastBackupText"></p>
+  </div>
+
+  <div class="panel">
+    <h3>⬇️⬆️ Exporter / importer</h3>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn ghost" id="exportBtn">⬇️ Exporter mes données</button>
-      <button class="btn ghost" id="importBtn">⬆️ Importer une sauvegarde</button>
+      <button class="btn" id="exportBtn">⬇️ Sauvegarder mes données</button>
+      <button class="btn ghost" id="importBtn">⬆️ Restaurer une sauvegarde</button>
       <input type="file" id="importFile" accept=".json" style="display:none">
     </div>
+    <p style="font-size:12.5px;color:var(--muted);margin-top:10px">
+      Sur téléphone, le bouton propose de partager directement le fichier (Drive, e-mail, WhatsApp…). Sur ordinateur, il télécharge un fichier <code>.json</code> à conserver précieusement.
+    </p>
   </div>
 </section>
 
@@ -554,6 +584,7 @@
   <button class="nav-btn" data-page="sport" aria-label="Sport" title="Sport">🏃</button>
   <button class="nav-btn" data-page="aliments" aria-label="Aliments Dukan" title="Aliments Dukan">🥗</button>
   <button class="nav-btn" data-page="profil" aria-label="Profil" title="Profil">⚙️</button>
+  <button class="nav-btn" data-page="sauvegarde" aria-label="Sauvegarde" title="Sauvegarde">💾<span class="nav-dot" id="backupDotBottom"></span></button>
 </nav>
 
 <div class="toast" id="toast"></div>
@@ -1419,33 +1450,77 @@ function renderPhases(){
       <ul>${ph.regles.map(r=>`<li>${r}</li>`).join("")}</ul>
     </div>`).join("");
 }
-function renderBackupReminder(){
-  const el=document.getElementById("backupReminder");
+function backupStatus(){
   const hasData = state.weights.length || Object.keys(state.journal).length || state.sports.length;
-  if(!hasData){ el.style.display="none"; return; }
+  if(!hasData) return {hasData:false, overdue:false, days:null};
   const last=state.meta.lastExport;
   const days = last ? daysBetween(last,todayStr()) : null;
-  if(days===null){
-    el.style.display="block";
-    el.textContent="💾 Vous n'avez encore jamais exporté vos données. Pensez à faire une sauvegarde régulièrement.";
-  } else if(days>14){
-    el.style.display="block";
-    el.textContent=`💾 Dernière sauvegarde il y a ${days} jours. Pensez à exporter vos données pour ne rien perdre.`;
-  } else {
-    el.style.display="none";
-  }
+  return {hasData:true, overdue: days===null||days>14, days};
+}
+function renderBackupReminder(){
+  const el=document.getElementById("backupReminder");
+  const st=backupStatus();
+  if(!st.hasData || !st.overdue){ el.style.display="none"; return; }
+  el.style.display="block";
+  el.textContent = st.days===null
+    ? "💾 Vous n'avez encore jamais exporté vos données. Pensez à faire une sauvegarde régulièrement."
+    : `💾 Dernière sauvegarde il y a ${st.days} jours. Pensez à exporter vos données pour ne rien perdre.`;
+}
+function updateBackupBadge(){
+  const overdue = backupStatus().overdue;
+  const top=document.getElementById("backupDotTop"), bottom=document.getElementById("backupDotBottom");
+  if(top) top.classList.toggle("show", overdue);
+  if(bottom) bottom.classList.toggle("show", overdue);
+}
+function dataSummary(){
+  return {
+    poids: state.weights.length,
+    journal: Object.keys(state.journal).length,
+    sport: state.sports.length,
+    menus: Object.keys(state.menus).length
+  };
+}
+function renderSauvegarde(){
+  const s=dataSummary();
+  document.getElementById("backupSummary").innerHTML=`
+    <div class="cards" style="margin-bottom:0">
+      <div class="card"><div class="label">Pesées</div><div class="value">${s.poids}</div></div>
+      <div class="card"><div class="label">Jours de journal</div><div class="value">${s.journal}</div></div>
+      <div class="card"><div class="label">Séances de sport</div><div class="value">${s.sport}</div></div>
+      <div class="card"><div class="label">Jours de menus</div><div class="value">${s.menus}</div></div>
+    </div>`;
+  const last=state.meta.lastExport;
+  document.getElementById("lastBackupText").textContent = last
+    ? "Dernière sauvegarde : "+fmtShort(last)
+    : "Vous n'avez encore jamais exporté vos données.";
+  renderBackupReminder();
+  updateBackupBadge();
 }
 /* export / import */
-document.getElementById("exportBtn").onclick=()=>{
+async function shareOrDownloadExport(){
+  const filename="sauvegarde-dukan-"+todayStr()+".json";
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="sauvegarde-dukan-"+todayStr()+".json";
-  a.click(); URL.revokeObjectURL(a.href);
+  let shared=false;
+  try{
+    const file=new File([blob], filename, {type:"application/json"});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:"Sauvegarde Dukan", text:"Ma sauvegarde de l'application Régime Dukan"});
+      shared=true;
+    }
+  }catch(err){
+    if(err && err.name==="AbortError") return; // l'utilisateur a annulé le partage : ne rien faire de plus
+  }
+  if(!shared){
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=filename;
+    a.click(); URL.revokeObjectURL(a.href);
+  }
   state.meta.lastExport=todayStr(); save();
-  renderBackupReminder();
-  toast("Sauvegarde téléchargée ✓");
-};
+  renderSauvegarde();
+  toast(shared?"Sauvegarde partagée ✓":"Sauvegarde téléchargée ✓");
+}
+document.getElementById("exportBtn").onclick=shareOrDownloadExport;
 document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
 document.getElementById("importFile").addEventListener("change",e=>{
   const f=e.target.files[0]; if(!f) return;
@@ -1473,7 +1548,9 @@ function renderAll(){
   if(active==="page-menus") renderMenus();
   if(active==="page-sport") renderSport();
   if(active==="page-aliments") renderAliments();
-  if(active==="page-profil"){ renderPhases(); renderBmr(); renderBackupReminder(); }
+  if(active==="page-profil"){ renderPhases(); renderBmr(); }
+  if(active==="page-sauvegarde") renderSauvegarde();
+  updateBackupBadge();
 }
 window.addEventListener("resize",()=>{ clearTimeout(window._rz); window._rz=setTimeout(renderAll,200); });
 fillProfil();
