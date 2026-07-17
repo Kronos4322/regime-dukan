@@ -46,6 +46,8 @@
     --badge-p1-bg:#e7f0fb; --badge-p1-fg:#1c5cab;
     --badge-p2-bg:#e2f6ee; --badge-p2-fg:#0e6e4c;
     --badge-p3-bg:#fdf3dd; --badge-p3-fg:#8a5d00;
+    --badge-p4-bg:#f1ecfd; --badge-p4-fg:#6b3fa0;
+    --badge-x-bg:#fbeaea; --badge-x-fg:#a83232;
     --shadow: 0 1px 2px rgba(11,11,11,.04), 0 6px 16px rgba(11,11,11,.05);
   }
   @media (prefers-color-scheme: dark){
@@ -73,6 +75,8 @@
       --badge-p1-bg:#152a45; --badge-p1-fg:#8fbdf2;
       --badge-p2-bg:#0f2e22; --badge-p2-fg:#5cd9a8;
       --badge-p3-bg:#3a2f12; --badge-p3-fg:#f0c419;
+      --badge-p4-bg:#2a1f45; --badge-p4-fg:#c9a6f2;
+      --badge-x-bg:#3a1f1f; --badge-x-fg:#e88a8a;
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 16px rgba(0,0,0,.35);
     }
   }
@@ -88,6 +92,8 @@
     --badge-p1-bg:#152a45; --badge-p1-fg:#8fbdf2;
     --badge-p2-bg:#0f2e22; --badge-p2-fg:#5cd9a8;
     --badge-p3-bg:#3a2f12; --badge-p3-fg:#f0c419;
+    --badge-p4-bg:#2a1f45; --badge-p4-fg:#c9a6f2;
+    --badge-x-bg:#3a1f1f; --badge-x-fg:#e88a8a;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 16px rgba(0,0,0,.35);
   }
   :root[data-theme="light"]{
@@ -102,6 +108,8 @@
     --badge-p1-bg:#e7f0fb; --badge-p1-fg:#1c5cab;
     --badge-p2-bg:#e2f6ee; --badge-p2-fg:#0e6e4c;
     --badge-p3-bg:#fdf3dd; --badge-p3-fg:#8a5d00;
+    --badge-p4-bg:#f1ecfd; --badge-p4-fg:#6b3fa0;
+    --badge-x-bg:#fbeaea; --badge-x-fg:#a83232;
     --shadow: 0 1px 2px rgba(11,11,11,.04), 0 6px 16px rgba(11,11,11,.05);
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -280,6 +288,8 @@
   .badge.p1{background:var(--badge-p1-bg);color:var(--badge-p1-fg)}
   .badge.p2{background:var(--badge-p2-bg);color:var(--badge-p2-fg)}
   .badge.p3{background:var(--badge-p3-bg);color:var(--badge-p3-fg)}
+  .badge.p4{background:var(--badge-p4-bg);color:var(--badge-p4-fg)}
+  .badge.x{background:var(--badge-x-bg);color:var(--badge-x-fg)}
   .phase-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
   .phase-card{border:1px solid var(--grid);border-radius:10px;padding:14px;background:var(--surface-2)}
   .phase-card.current{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
@@ -345,7 +355,7 @@
     <div class="chart-wrap" id="calChart"></div>
     <div class="legend">
       <span><span class="dot" style="background:var(--series-1)"></span> Consommées (alimentation)</span>
-      <span><span class="dot" style="background:var(--series-2)"></span> Brûlées (sport)</span>
+      <span><span class="dot" style="background:var(--series-2)"></span> Brûlées (sport + pas)</span>
     </div>
   </div>
   <div class="panel">
@@ -441,6 +451,15 @@
 <!-- ══════════ SPORT ══════════ -->
 <section class="page" id="page-sport">
   <div class="panel">
+    <h3>🚶 Nombre de pas quotidien</h3>
+    <form class="inline" id="stepsForm">
+      <div class="field"><label for="stDate">Date</label><input type="date" id="stDate" required></div>
+      <div class="field"><label for="stSteps">Nombre de pas</label><input type="number" id="stSteps" min="0" max="100000" step="100" placeholder="ex : 8000"></div>
+      <button class="btn" type="submit">Enregistrer</button>
+    </form>
+    <p style="font-size:12.5px;color:var(--muted);margin-top:6px" id="stepsPreview"></p>
+  </div>
+  <div class="panel">
     <h3>➕ Nouvelle activité</h3>
     <form class="inline" id="sportForm">
       <div class="field"><label for="sDate">Date</label><input type="date" id="sDate" required></div>
@@ -460,15 +479,27 @@
     <h3>📋 Historique des activités</h3>
     <div style="overflow-x:auto"><table id="sportTable"></table></div>
   </div>
+  <div class="panel">
+    <h3>🚶 Historique des pas</h3>
+    <div style="overflow-x:auto"><table id="stepsTable"></table></div>
+  </div>
 </section>
 
 <!-- ══════════ ALIMENTS ══════════ -->
 <section class="page" id="page-aliments">
-  <div class="panel">
-    <h3>🥗 Les 100 aliments autorisés à volonté</h3>
+  <div class="datenav">
+    <div class="segmented">
+      <button data-foodview="autorises" class="active">✅ Autorisés</button>
+      <button data-foodview="interdits">❌ À éviter</button>
+    </div>
+  </div>
+
+  <div class="panel" id="foodsAllowedPanel">
+    <h3>🥗 Aliments autorisés</h3>
     <p style="font-size:13.5px;color:var(--ink-2);margin-bottom:14px">
-      Le régime Dukan autorise <strong>72 aliments riches en protéines</strong> (dès la phase d'Attaque)
-      et <strong>28 légumes</strong> (jours PL, dès la phase de Croisière) — à volonté.
+      Les aliments <strong>riches en protéines</strong> (dès la phase d'Attaque) et les <strong>légumes</strong>
+      (jours PL, dès la phase de Croisière) sont à volonté. Les aliments <strong>tolérés</strong> sont limités à 2 par jour.
+      Les <strong>réintroductions</strong> concernent les phases Consolidation et Stabilisation, en quantités précises.
     </p>
     <div class="filters">
       <input type="search" id="foodSearch" placeholder="🔍 Rechercher un aliment…" style="min-width:220px" aria-label="Rechercher un aliment">
@@ -478,9 +509,23 @@
         <option value="1">Dès l'Attaque (protéines)</option>
         <option value="2">Dès la Croisière (légumes)</option>
         <option value="3">Tolérés (max 2/jour)</option>
+        <option value="4">Réintroductions (Consolidation/Stabilisation)</option>
       </select>
     </div>
     <div class="food-grid" id="foodGrid"></div>
+  </div>
+
+  <div class="panel" id="foodsForbiddenPanel" style="display:none">
+    <h3>❌ Aliments à éviter</h3>
+    <p style="font-size:13.5px;color:var(--ink-2);margin-bottom:14px">
+      Ces aliments ne font pas partie de la liste Dukan aux phases Attaque et Croisière — trop gras, trop sucrés ou trop riches
+      en féculents. Certains redeviennent possibles, en quantité limitée, dès la Consolidation.
+    </p>
+    <div class="filters">
+      <input type="search" id="forbiddenSearch" placeholder="🔍 Rechercher…" style="min-width:220px" aria-label="Rechercher un aliment à éviter">
+      <select id="forbiddenCatFilter" aria-label="Filtrer par catégorie"><option value="">Toutes les catégories</option></select>
+    </div>
+    <div class="food-grid" id="forbiddenGrid"></div>
   </div>
 </section>
 
@@ -599,6 +644,7 @@ const defaultState = {
   menus:{},              // {"YYYY-MM-DD":{pdj,dej,col,din}}
   sports:[],             // {date, activite, duree, kcal}
   water:{},              // {"YYYY-MM-DD": nombre de verres}
+  steps:{},              // {"YYYY-MM-DD": nombre de pas}
   meta:{lastExport:null}
 };
 let state = loadState();
@@ -670,11 +716,14 @@ const FOODS = [
   {n:"Lapin",c:"Viande",k:135,pr:21,p:1},{n:"Viande de cheval",c:"Viande",k:110,pr:21,p:1},
   {n:"Jambon blanc dégraissé",c:"Viande",k:110,pr:20,p:1},{n:"Bresaola (viande des Grisons)",c:"Viande",k:150,pr:32,p:1},
   {n:"Steak haché 5%",c:"Viande",k:130,pr:20,p:1},{n:"Langue de veau",c:"Viande",k:130,pr:16,p:1},
+  {n:"Onglet",c:"Viande",k:125,pr:21,p:1},{n:"Tartare de bœuf maigre",c:"Viande",k:125,pr:21,p:1},
+  {n:"Jambon cru dégraissé (gras retiré)",c:"Viande",k:140,pr:24,p:1},
   // Volailles
   {n:"Poulet (sans peau)",c:"Volaille",k:120,pr:23,p:1},{n:"Escalope de dinde",c:"Volaille",k:105,pr:24,p:1},
   {n:"Jambon de poulet",c:"Volaille",k:105,pr:18,p:1},{n:"Jambon de dinde",c:"Volaille",k:100,pr:18,p:1},
   {n:"Pintade",c:"Volaille",k:110,pr:22,p:1},{n:"Caille",c:"Volaille",k:115,pr:22,p:1},
   {n:"Pigeon",c:"Volaille",k:140,pr:22,p:1},{n:"Autruche",c:"Volaille",k:115,pr:22,p:1},
+  {n:"Blanc de poulet fumé",c:"Volaille",k:110,pr:22,p:1},
   // Poissons
   {n:"Cabillaud",c:"Poisson",k:80,pr:18,p:1},{n:"Colin / lieu",c:"Poisson",k:85,pr:17,p:1},
   {n:"Sole",c:"Poisson",k:85,pr:17,p:1},{n:"Merlan",c:"Poisson",k:90,pr:18,p:1},
@@ -687,6 +736,9 @@ const FOODS = [
   {n:"Turbot",c:"Poisson",k:95,pr:17,p:1},{n:"Espadon",c:"Poisson",k:120,pr:20,p:1},
   {n:"Flétan",c:"Poisson",k:110,pr:19,p:1},{n:"Cabillaud (œufs de)",c:"Poisson",k:115,pr:20,p:1},
   {n:"Surimi",c:"Poisson",k:95,pr:10,p:1},
+  {n:"Lotte (baudroie)",c:"Poisson",k:85,pr:18,p:1},{n:"Merlu",c:"Poisson",k:85,pr:17,p:1},
+  {n:"Anchois nature",c:"Poisson",k:135,pr:20,p:1},{n:"Hareng",c:"Poisson",k:190,pr:18,p:1},
+  {n:"Églefin (haddock)",c:"Poisson",k:90,pr:19,p:1},
   // Fruits de mer
   {n:"Crevettes",c:"Fruits de mer",k:90,pr:20,p:1},{n:"Gambas",c:"Fruits de mer",k:95,pr:20,p:1},
   {n:"Moules",c:"Fruits de mer",k:75,pr:12,p:1},{n:"Huîtres",c:"Fruits de mer",k:70,pr:9,p:1},
@@ -695,6 +747,7 @@ const FOODS = [
   {n:"Coquilles Saint-Jacques",c:"Fruits de mer",k:90,pr:17,p:1},{n:"Calamars",c:"Fruits de mer",k:80,pr:15,p:1},
   {n:"Poulpe",c:"Fruits de mer",k:80,pr:15,p:1},{n:"Seiche",c:"Fruits de mer",k:80,pr:16,p:1},
   {n:"Bulots",c:"Fruits de mer",k:90,pr:17,p:1},{n:"Palourdes",c:"Fruits de mer",k:75,pr:13,p:1},
+  {n:"Praires",c:"Fruits de mer",k:75,pr:13,p:1},{n:"Ormeaux",c:"Fruits de mer",k:85,pr:17,p:1},
   // Œufs
   {n:"Œufs de poule",c:"Œufs",k:145,pr:13,p:1},{n:"Œufs de caille",c:"Œufs",k:155,pr:13,p:1},
   {n:"Blanc d'œuf",c:"Œufs",k:50,pr:11,p:1},
@@ -702,6 +755,7 @@ const FOODS = [
   {n:"Fromage blanc 0%",c:"Laitage 0%",k:45,pr:8,p:1},{n:"Yaourt nature 0%",c:"Laitage 0%",k:40,pr:5,p:1},
   {n:"Petits-suisses 0%",c:"Laitage 0%",k:50,pr:8,p:1},{n:"Faisselle 0%",c:"Laitage 0%",k:45,pr:8,p:1},
   {n:"Lait écrémé",c:"Laitage 0%",k:35,pr:3.4,p:1},{n:"Yaourt aromatisé 0% (sans sucre)",c:"Laitage 0%",k:45,pr:4.5,p:1},
+  {n:"Skyr nature 0%",c:"Laitage 0%",k:65,pr:10,p:1},{n:"Yaourt à la grecque 0%",c:"Laitage 0%",k:55,pr:7,p:1},
   // Protéines végétales
   {n:"Tofu",c:"Protéine végétale",k:120,pr:12,p:1},{n:"Seitan",c:"Protéine végétale",k:140,pr:25,p:1},
   {n:"Steak de soja",c:"Protéine végétale",k:130,pr:18,p:1},{n:"Tempeh",c:"Protéine végétale",k:190,pr:19,p:1},
@@ -721,13 +775,65 @@ const FOODS = [
   {n:"Poireau",c:"Légume",k:30,pr:1.5,p:2},{n:"Poivron",c:"Légume",k:25,pr:1,p:2},
   {n:"Potiron / citrouille",c:"Légume",k:20,pr:1,p:2},{n:"Radis",c:"Légume",k:15,pr:0.7,p:2},
   {n:"Pousses de soja",c:"Légume",k:50,pr:3.6,p:2},{n:"Tomate",c:"Légume",k:18,pr:0.9,p:2},
+  {n:"Ail",c:"Légume",k:150,pr:6,p:2},{n:"Persil / herbes fraîches",c:"Légume",k:35,pr:3,p:2},
+  {n:"Cornichons",c:"Légume",k:11,pr:0.9,p:2},{n:"Gingembre frais",c:"Légume",k:80,pr:1.8,p:2},
   // Indispensables & tolérés
   {n:"Son d'avoine",c:"Indispensable",k:350,pr:15,p:1},{n:"Son de blé",c:"Indispensable",k:260,pr:16,p:1},
   {n:"Café / thé (sans sucre)",c:"Boisson",k:0,pr:0,p:1},{n:"Eau / eau gazeuse",c:"Boisson",k:0,pr:0,p:1},
   {n:"Fromage blanc 3% (toléré)",c:"Toléré",k:60,pr:7,p:3},{n:"Lait de soja nature (toléré)",c:"Toléré",k:45,pr:3,p:3},
   {n:"Maïzena (toléré, 1 c.à.s.)",c:"Toléré",k:380,pr:0.3,p:3},{n:"Cacao dégraissé 1% (toléré, 1 c.à.c.)",c:"Toléré",k:250,pr:20,p:3},
   {n:"Crème fraîche 4% (toléré, 1 c.à.s.)",c:"Toléré",k:80,pr:3,p:3},{n:"Vin blanc de cuisson (toléré, 3 c.à.s.)",c:"Toléré",k:80,pr:0.1,p:3},
-  {n:"Saucisse de volaille <10% MG (toléré)",c:"Toléré",k:170,pr:15,p:3},{n:"Baies de goji (toléré, 1 c.à.s.)",c:"Toléré",k:310,pr:14,p:3}
+  {n:"Saucisse de volaille <10% MG (toléré)",c:"Toléré",k:170,pr:15,p:3},{n:"Baies de goji (toléré, 1 c.à.s.)",c:"Toléré",k:310,pr:14,p:3},
+  // Réintroductions (Consolidation / Stabilisation, en quantités précises)
+  {n:"Pomme (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:52,pr:0.3,p:4},
+  {n:"Poire (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:57,pr:0.4,p:4},
+  {n:"Fraises (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:32,pr:0.7,p:4},
+  {n:"Pêche (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:39,pr:0.9,p:4},
+  {n:"Melon (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:34,pr:0.8,p:4},
+  {n:"Kiwi (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:61,pr:1.1,p:4},
+  {n:"Pain complet (2 tranches, Consolidation)",c:"Féculent (réintroduction)",k:250,pr:9,p:4},
+  {n:"Fromage à pâte dure (40 g, Consolidation)",c:"Fromage (réintroduction)",k:380,pr:26,p:4},
+  {n:"Riz complet (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:130,pr:2.7,p:4},
+  {n:"Pâtes complètes (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:124,pr:5,p:4},
+  {n:"Pommes de terre (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:77,pr:2,p:4},
+  {n:"Lentilles cuites (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:116,pr:9,p:4}
+];
+
+/* ═══════════════════ ALIMENTS À ÉVITER ═══════════════════ */
+const FORBIDDEN = [
+  {n:"Sucre blanc",c:"Sucres",r:"Sucre pur, à éviter à tous les stades"},
+  {n:"Miel",c:"Sucres",r:"Très riche en sucres rapides"},
+  {n:"Confiture classique",c:"Sucres",r:"Sucre ajouté élevé (préférer une version sans sucre, tolérée)"},
+  {n:"Bonbons & sucreries",c:"Sucres",r:"Sucres rapides, aucun intérêt nutritionnel"},
+  {n:"Chocolat (hors cacao dégraissé)",c:"Sucres",r:"Riche en sucre et en matières grasses"},
+  {n:"Pâtisseries & viennoiseries",c:"Sucres",r:"Sucre et matières grasses combinés"},
+  {n:"Céréales du petit-déjeuner sucrées",c:"Sucres",r:"Sucres ajoutés élevés"},
+  {n:"Sodas sucrés",c:"Boissons",r:"Sucres rapides liquides"},
+  {n:"Jus de fruits",c:"Boissons",r:"Sucres concentrés, peu de fibres"},
+  {n:"Alcool (vin, bière, spiritueux)",c:"Boissons",r:"Calories vides, freine la perte de poids"},
+  {n:"Pain blanc",c:"Féculents",r:"Féculent interdit en Attaque/Croisière"},
+  {n:"Riz blanc",c:"Féculents",r:"Féculent interdit en Attaque/Croisière"},
+  {n:"Pâtes",c:"Féculents",r:"Féculent interdit en Attaque/Croisière"},
+  {n:"Pommes de terre",c:"Féculents",r:"Interdit en Attaque/Croisière (réintroduit en Stabilisation)"},
+  {n:"Semoule / couscous",c:"Féculents",r:"Féculent interdit en Attaque/Croisière"},
+  {n:"Maïs",c:"Féculents",r:"Féculent/légume sucré interdit en Attaque/Croisière"},
+  {n:"Lentilles, pois chiches, haricots secs",c:"Légumineuses",r:"Trop riches en glucides pour les phases PP/PL"},
+  {n:"Huile (en grande quantité)",c:"Matières grasses",r:"Très calorique ; seule une quantité minime est tolérée"},
+  {n:"Beurre",c:"Matières grasses",r:"Matière grasse pure"},
+  {n:"Mayonnaise & sauces grasses",c:"Matières grasses",r:"Très riches en lipides"},
+  {n:"Fritures",c:"Matières grasses",r:"Cuisson interdite ; préférer grill, vapeur, four"},
+  {n:"Avocat",c:"Fruits gras",r:"Fruit très riche en lipides"},
+  {n:"Noix, amandes, noisettes",c:"Fruits gras",r:"Oléagineux riches en graisses"},
+  {n:"Banane",c:"Fruits",r:"Fruit très sucré, interdit en Attaque/Croisière"},
+  {n:"Raisin",c:"Fruits",r:"Fruit très sucré, interdit en Attaque/Croisière"},
+  {n:"Fruits secs (dattes, figues, abricots secs)",c:"Fruits",r:"Sucres très concentrés"},
+  {n:"Charcuterie grasse (saucisson, chorizo, pâté, rillettes)",c:"Charcuterie",r:"Trop riche en matières grasses"},
+  {n:"Lardons",c:"Charcuterie",r:"Viande grasse transformée"},
+  {n:"Fromages gras non allégés",c:"Laitages gras",r:"Riches en matières grasses (40 g toléré en Consolidation)"},
+  {n:"Crème fraîche entière",c:"Laitages gras",r:"Trop grasse (préférer la version 4% tolérée en petite quantité)"},
+  {n:"Viandes grasses (porc gras, côtes, agneau)",c:"Viandes grasses",r:"Trop riches en matières grasses"},
+  {n:"Peau de volaille",c:"Viandes grasses",r:"Concentre la majorité des graisses"},
+  {n:"Chips & biscuits apéritifs",c:"Snacks",r:"Frits et très caloriques"}
 ];
 
 /* ═══════════════════ ACTIVITÉS SPORTIVES (MET) ═══════════════════ */
@@ -798,6 +904,15 @@ function journalKcal(dateStr){ return (state.journal[dateStr]||[]).reduce((s,e)=
 function journalProtein(dateStr){ return (state.journal[dateStr]||[]).reduce((s,e)=>s+(+e.prot||0),0); }
 function proteinTarget(){ const w=currentWeight()||state.profile.depart; return w?Math.round(w):null; }
 function sportKcalDay(dateStr){ return state.sports.filter(s=>s.date===dateStr).reduce((s,e)=>s+(+e.kcal||0),0); }
+function stepsCount(dateStr){ return state.steps[dateStr]||0; }
+function saveSteps(dateStr,n){ if(!n||n<=0) delete state.steps[dateStr]; else state.steps[dateStr]=n; save(); }
+/* Calories brûlées par les pas — estimation ≈ 0,0005 kcal par pas et par kg de poids corporel */
+function stepsKcal(dateStr){
+  const n=stepsCount(dateStr); if(!n) return 0;
+  const w=currentWeight()||state.profile.depart||70;
+  return Math.round(n*w*0.0005);
+}
+function burnedKcalDay(dateStr){ return sportKcalDay(dateStr)+stepsKcal(dateStr); }
 function waterCount(dateStr){ return state.water[dateStr]||0; }
 function saveWater(dateStr,n){ if(n<=0) delete state.water[dateStr]; else state.water[dateStr]=n; save(); }
 function imc(poids){
@@ -951,7 +1066,7 @@ function renderWeightChart(container, height){
 function renderCalChart(){
   const el=document.getElementById("calChart");
   const days=[]; for(let i=6;i>=0;i--) days.push(addDays(todayStr(),-i));
-  const eat=days.map(d=>journalKcal(d)), burn=days.map(d=>sportKcalDay(d));
+  const eat=days.map(d=>journalKcal(d)), burn=days.map(d=>burnedKcalDay(d));
   if(eat.every(v=>!v)&&burn.every(v=>!v)){
     el.innerHTML='<p class="empty">Notez vos repas et vos séances de sport pour voir vos calories ici.</p>'; return;
   }
@@ -1026,7 +1141,9 @@ function renderDashboard(){
   if(rate!=null) cards.push({label:"Rythme hebdo",value:(rate>=0?"+":"")+rate.toFixed(2)+" <small>kg/sem</small>",
     sub:rate<-0.05?"📉 Perte de poids":rate>0.05?"📈 Prise de poids":"➖ Stable",
     cls:rate<-0.05?"good":rate>0.05?"bad":""});
-  cards.push({label:"Aujourd'hui",value:journalKcal(t)+" <small>kcal</small>",sub:"🏃 "+sportKcalDay(t)+" kcal brûlées"});
+  cards.push({label:"Aujourd'hui",value:journalKcal(t)+" <small>kcal</small>",sub:"🏃 "+burnedKcalDay(t)+" kcal brûlées"});
+  const stepsToday=stepsCount(t);
+  if(stepsToday) cards.push({label:"Pas aujourd'hui",value:stepsToday.toLocaleString("fr-FR")+" <small>pas</small>",sub:"🔥 "+stepsKcal(t)+" kcal · repère indicatif : 10 000 pas/j"});
   const b=bmr();
   if(b) cards.push({label:"Métabolisme de base",value:b+" <small>kcal/j</small>",sub:"Estimation indicative"});
   document.getElementById("dashCards").innerHTML=cards.map(c=>
@@ -1044,7 +1161,8 @@ function renderDashboard(){
   }
   html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>🍽️ Repas notés :</strong> ${meals.length?meals.map(m=>escapeHtml(m.aliment)).join(", "):"aucun pour l'instant"}</p>`;
   html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>💧 Eau :</strong> ${waterCount(t)} verre(s) (~${(waterCount(t)*0.25).toFixed(2)} L)</p>`;
-  html+=`<p style="font-size:13.5px"><strong>🏃 Sport :</strong> ${sports.length?sports.map(s=>escapeHtml(s.activite)+" ("+s.duree+" min)").join(", "):"aucune activité notée"}</p>`;
+  html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>🏃 Sport :</strong> ${sports.length?sports.map(s=>escapeHtml(s.activite)+" ("+s.duree+" min)").join(", "):"aucune activité notée"}</p>`;
+  html+=`<p style="font-size:13.5px"><strong>🚶 Pas :</strong> ${stepsCount(t)?stepsCount(t).toLocaleString("fr-FR")+" pas (~"+stepsKcal(t)+" kcal)":"aucun pas noté"}</p>`;
   html+=`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
     <button class="btn small" onclick="goToPage('journal')">Noter un repas</button>
     <button class="btn ghost small" onclick="goToPage('poids')">Ajouter une pesée</button>
@@ -1197,12 +1315,12 @@ function renderJournal(){
     html+=`</div>`;
   });
   document.getElementById("journalMeals").innerHTML=html;
-  const tot=journalKcal(journalDate), sp=sportKcalDay(journalDate), prot=journalProtein(journalDate), pt=proteinTarget();
+  const tot=journalKcal(journalDate), sp=burnedKcalDay(journalDate), prot=journalProtein(journalDate), pt=proteinTarget();
   const dt=dayType(journalDate);
   document.getElementById("journalTotals").innerHTML=`
     <div class="card"><div class="label">Total consommé</div><div class="value">${tot} <small>kcal</small></div></div>
     <div class="card"><div class="label">Protéines</div><div class="value">${prot} <small>g</small></div>${pt?`<div class="sub">Repère ≈ ${pt} g/j (1 g/kg)</div>`:""}</div>
-    <div class="card"><div class="label">Sport (brûlées)</div><div class="value">${sp} <small>kcal</small></div></div>
+    <div class="card"><div class="label">Brûlées (sport + pas)</div><div class="value">${sp} <small>kcal</small></div></div>
     <div class="card"><div class="label">Bilan net</div><div class="value">${tot-sp} <small>kcal</small></div></div>
     ${dt?`<div class="card"><div class="label">Type de jour Dukan</div><div class="value" style="font-size:19px">${dt}</div></div>`:""}`;
 }
@@ -1360,9 +1478,53 @@ function editSport(i){
   document.getElementById("sportSubmitBtn").textContent="Mettre à jour";
   document.getElementById("page-sport").scrollIntoView({behavior:"smooth",block:"start"});
 }
+document.getElementById("stepsForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const date=document.getElementById("stDate").value;
+  const n=parseInt(document.getElementById("stSteps").value);
+  if(!date||!n) return;
+  saveSteps(date,n);
+  toast("Pas enregistrés ✓");
+  document.getElementById("stSteps").value="";
+  renderAll();
+});
+document.getElementById("stSteps").addEventListener("input",updateStepsPreview);
+function updateStepsPreview(){
+  const n=parseInt(document.getElementById("stSteps").value)||0;
+  const preview=document.getElementById("stepsPreview");
+  if(!n){ preview.textContent="💡 Estimation indicative des calories brûlées selon votre poids actuel."; return; }
+  const w=currentWeight()||state.profile.depart||70;
+  preview.textContent=`≈ ${Math.round(n*w*0.0005)} kcal brûlées, ~${(n*0.00075).toFixed(1)} km parcourus (estimation).`;
+}
+function editStep(date){
+  document.getElementById("stDate").value=date;
+  document.getElementById("stSteps").value=stepsCount(date);
+  updateStepsPreview();
+  toast("Modifiez la valeur puis enregistrez.");
+}
+function delStep(date){
+  if(!confirm("Supprimer le nombre de pas du "+fmtShort(date)+" ?")) return;
+  delete state.steps[date]; save(); renderAll();
+}
+function renderSteps(){
+  document.getElementById("stDate").value ||= todayStr();
+  updateStepsPreview();
+  const tbl=document.getElementById("stepsTable");
+  const dates=Object.keys(state.steps).sort((a,b)=>a<b?1:-1).slice(0,60);
+  if(!dates.length){ tbl.innerHTML='<tr><td class="empty">Aucun nombre de pas enregistré pour l\'instant.</td></tr>'; return; }
+  let rows=`<tr><th>Date</th><th class="num">Pas</th><th class="num">Calories</th><th></th></tr>`;
+  dates.forEach(d=>{
+    const n=state.steps[d];
+    rows+=`<tr><td>${fmtShort(d)}</td><td class="num">${n.toLocaleString("fr-FR")}</td>
+      <td class="num"><strong>${stepsKcal(d)}</strong> kcal</td>
+      <td style="white-space:nowrap"><button class="del" aria-label="Modifier les pas du ${fmtShort(d)}" onclick="editStep('${d}')">✏️</button><button class="del" aria-label="Supprimer les pas du ${fmtShort(d)}" onclick="delStep('${d}')">🗑️</button></td></tr>`;
+  });
+  tbl.innerHTML=rows;
+}
 function renderSport(){
   document.getElementById("sDate").value ||= todayStr();
   autoSportKcal();
+  renderSteps();
   // stats semaine
   const mon=mondayOf(todayStr());
   const week=state.sports.filter(s=>s.date>=mon&&s.date<=addDays(mon,6));
@@ -1398,6 +1560,15 @@ function delSport(i){
 }
 
 /* ═══════════════════ PAGE ALIMENTS ═══════════════════ */
+document.querySelectorAll('#page-aliments .segmented button').forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll('#page-aliments .segmented button').forEach(x=>x.classList.toggle("active",x===b));
+    const isAllowed=b.dataset.foodview==="autorises";
+    document.getElementById("foodsAllowedPanel").style.display=isAllowed?"block":"none";
+    document.getElementById("foodsForbiddenPanel").style.display=isAllowed?"none":"block";
+    if(!isAllowed) renderForbidden();
+  });
+});
 const catSel=document.getElementById("foodCatFilter");
 [...new Set(FOODS.map(f=>f.c))].forEach(c=>{ catSel.innerHTML+=`<option>${c}</option>`; });
 ["foodSearch","foodCatFilter","foodPhaseFilter"].forEach(id=>
@@ -1407,11 +1578,25 @@ function renderAliments(){
   const cat=catSel.value, ph=document.getElementById("foodPhaseFilter").value;
   const list=FOODS.filter(f=>
     (!q||f.n.toLowerCase().includes(q))&&(!cat||f.c===cat)&&(!ph||String(f.p)===ph));
-  const badge=p=>p===1?'<span class="badge p1">Dès l\'Attaque</span>':p===2?'<span class="badge p2">Dès la Croisière</span>':'<span class="badge p3">Toléré</span>';
+  const badge=p=>p===1?'<span class="badge p1">Dès l\'Attaque</span>':p===2?'<span class="badge p2">Dès la Croisière</span>':p===3?'<span class="badge p3">Toléré</span>':'<span class="badge p4">Réintroduction</span>';
   document.getElementById("foodGrid").innerHTML = list.length ? list.map(f=>`
     <div class="food-item">
       <div><div class="fname">${f.n}</div><div class="fmeta">${f.c} · ${f.k} kcal · ${f.pr} g prot. /100 g</div></div>
       ${badge(f.p)}
+    </div>`).join("") : '<p class="empty">Aucun aliment ne correspond à votre recherche.</p>';
+}
+const forbiddenCatSel=document.getElementById("forbiddenCatFilter");
+[...new Set(FORBIDDEN.map(f=>f.c))].forEach(c=>{ forbiddenCatSel.innerHTML+=`<option>${c}</option>`; });
+["forbiddenSearch","forbiddenCatFilter"].forEach(id=>
+  document.getElementById(id).addEventListener("input",renderForbidden));
+function renderForbidden(){
+  const q=document.getElementById("forbiddenSearch").value.toLowerCase();
+  const cat=forbiddenCatSel.value;
+  const list=FORBIDDEN.filter(f=>(!q||f.n.toLowerCase().includes(q))&&(!cat||f.c===cat));
+  document.getElementById("forbiddenGrid").innerHTML = list.length ? list.map(f=>`
+    <div class="food-item">
+      <div><div class="fname">${f.n}</div><div class="fmeta">${f.c} · ${f.r}</div></div>
+      <span class="badge x">À éviter</span>
     </div>`).join("") : '<p class="empty">Aucun aliment ne correspond à votre recherche.</p>';
 }
 
