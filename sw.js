@@ -1,4 +1,4 @@
-const CACHE = "dukan-app-v3";
+const CACHE = "dukan-app-v4";
 const ASSETS = [
   "./index.html",
   "./manifest.json",
@@ -27,7 +27,7 @@ self.addEventListener("fetch", e=>{
     // Page HTML : toujours essayer le réseau en premier pour avoir la dernière version.
     // Le cache ne sert que de secours hors-ligne.
     e.respondWith(
-      fetch(e.request).then(res=>{
+      fetch(e.request, {cache:"no-store"}).then(res=>{
         const copy=res.clone();
         caches.open(CACHE).then(c=>c.put(e.request,copy));
         return res;

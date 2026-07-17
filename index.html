@@ -307,7 +307,7 @@
   }
 </style>
 </head>
-<body data-build="test-sw-fix-1">
+<body>
 
 <header>
   <h1>⚖️ Mon Régime <span>Dukan</span></h1>
@@ -1561,7 +1561,9 @@ renderAll();
 /* ═══════════════════ APPLICATION INSTALLABLE (PWA) ═══════════════════ */
 if("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost")){
   window.addEventListener("load", ()=>{
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    navigator.serviceWorker.register("./sw.js", {updateViaCache:"none"}).then(reg=>{
+      reg.update().catch(()=>{});
+    }).catch(()=>{});
   });
 }
 </script>
