@@ -116,9 +116,12 @@
   html{-webkit-tap-highlight-color:transparent}
   body{
     font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-    background:var(--page);color:var(--ink);
+    background:
+      radial-gradient(1100px 520px at 12% -12%, var(--accent-soft), transparent 60%),
+      var(--page);
+    color:var(--ink);
     min-height:100vh;font-size:15px;
-    transition:background .2s ease,color .2s ease;
+    transition:background-color .2s ease,color .2s ease;
   }
   header{
     background:var(--surface-1);border-bottom:1px solid var(--grid);
@@ -126,7 +129,7 @@
     display:flex;align-items:center;gap:12px;flex-wrap:wrap;
     position:sticky;top:0;z-index:50;
   }
-  header h1{font-size:18px;font-weight:700;white-space:nowrap}
+  header h1{font-size:19px;font-weight:800;white-space:nowrap;letter-spacing:-.01em;cursor:pointer}
   header h1 span{color:var(--accent)}
   .phase-pill{
     background:var(--accent-soft);color:var(--accent);
@@ -148,10 +151,10 @@
   .top-nav .nav-btn{
     background:none;border:none;padding:11px 14px;font-size:14px;cursor:pointer;
     color:var(--ink-2);border-bottom:2.5px solid transparent;white-space:nowrap;
-    font-family:inherit;
+    font-family:inherit;border-radius:8px 8px 0 0;transition:background-color .15s ease,color .15s ease;
   }
-  .top-nav .nav-btn:hover{color:var(--ink)}
-  .top-nav .nav-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+  .top-nav .nav-btn:hover{color:var(--ink);background:var(--accent-soft)}
+  .top-nav .nav-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;background:var(--accent-soft)}
 
   .bottom-nav{
     display:none;position:fixed;left:0;right:0;bottom:0;z-index:60;
@@ -188,10 +191,10 @@
   h3{font-size:15px;margin-bottom:10px}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
   .card{
-    background:var(--surface-1);border:1px solid var(--border);border-radius:12px;
+    background:var(--surface-1);border:1px solid var(--border);border-radius:14px;
     padding:14px 16px;box-shadow:var(--shadow);transition:transform .15s ease,box-shadow .15s ease;
   }
-  @media (hover:hover){ .card:hover{transform:translateY(-2px)} }
+  @media (hover:hover){ .card:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgba(11,11,11,.06),0 14px 26px rgba(11,11,11,.07)} }
   .card .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
   .card .value{font-size:26px;font-weight:700;line-height:1.1}
   .card .value small{font-size:14px;font-weight:500;color:var(--ink-2)}
@@ -199,9 +202,46 @@
   .card .sub.good{color:var(--good);font-weight:600}
   .card .sub.bad{color:var(--critical);font-weight:600}
   .panel{
-    background:var(--surface-1);border:1px solid var(--border);border-radius:14px;
+    background:var(--surface-1);border:1px solid var(--border);border-radius:16px;
     padding:18px;margin-bottom:18px;box-shadow:var(--shadow);
   }
+  /* ── Page de garde (Accueil) ── */
+  .hero{
+    background:linear-gradient(135deg,var(--accent) 0%,var(--series-2) 100%);
+    border-radius:20px;padding:26px;margin-bottom:22px;color:#fff;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(circle at 88% -15%,rgba(255,255,255,.28),transparent 60%);
+  }
+  .hero-greeting{font-size:22px;font-weight:800;margin-bottom:3px;position:relative}
+  .hero-date{font-size:13px;opacity:.88;text-transform:capitalize;margin-bottom:14px;position:relative}
+  .hero-phase{
+    display:inline-flex;align-items:center;background:rgba(255,255,255,.18);
+    padding:6px 14px;border-radius:99px;font-size:12.5px;font-weight:600;margin-bottom:16px;position:relative;
+  }
+  .hero-stats{display:flex;gap:10px;flex-wrap:wrap;position:relative}
+  .hero-stat{background:rgba(255,255,255,.16);border-radius:12px;padding:10px 14px;min-width:108px}
+  .hero-stat .hs-label{display:block;font-size:11px;opacity:.88;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+  .hero-stat .hs-value{display:block;font-size:18px;font-weight:700}
+  .tile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:10px}
+  .tile{
+    display:flex;align-items:center;gap:14px;text-align:left;width:100%;
+    background:var(--surface-1);border:1px solid var(--border);border-radius:16px;
+    padding:16px 18px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow);
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+  }
+  .tile:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(11,11,11,.06),0 16px 30px rgba(11,11,11,.09);border-color:var(--tile-accent,var(--accent))}
+  .tile:active{transform:scale(.98)}
+  .tile-icon{
+    flex-shrink:0;width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    font-size:21px;background:color-mix(in srgb, var(--tile-accent, var(--accent)) 18%, var(--surface-2));
+  }
+  .tile-text{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+  .tile-title{font-size:14.5px;font-weight:700}
+  .tile-desc{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tile-arrow{color:var(--muted);font-size:16px;flex-shrink:0}
   .panel h3{display:flex;align-items:center;gap:8px}
   form.inline{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:4px}
   .field{display:flex;flex-direction:column;gap:4px}
@@ -212,7 +252,7 @@
   }
   input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
   button.btn{
-    font-family:inherit;font-size:14px;font-weight:600;padding:9px 16px;border-radius:8px;
+    font-family:inherit;font-size:14px;font-weight:600;padding:9px 16px;border-radius:10px;
     border:none;background:var(--accent);color:#fff;cursor:pointer;transition:background .15s ease,transform .1s ease;
   }
   button.btn:hover{background:var(--accent-hover)}
@@ -279,9 +319,14 @@
   .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
   .food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:8px}
   .food-item{
-    border:1px solid var(--grid);border-radius:9px;padding:9px 11px;background:var(--surface-2);
-    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    border:1px solid var(--grid);border-left:3px solid var(--grid);border-radius:9px;padding:9px 11px;background:var(--surface-2);
+    display:flex;justify-content:space-between;align-items:center;gap:8px;transition:border-color .15s ease,transform .12s ease;
   }
+  @media (hover:hover){ .food-item:hover{transform:translateY(-1px)} }
+  .food-item.p1{border-left-color:var(--badge-p1-fg)}
+  .food-item.p2{border-left-color:var(--badge-p2-fg)}
+  .food-item.p3{border-left-color:var(--badge-p3-fg)}
+  .food-item.p4{border-left-color:var(--badge-p4-fg)}
   .food-item .fname{font-size:13.5px;font-weight:600}
   .food-item .fmeta{font-size:11.5px;color:var(--muted)}
   .badge{font-size:10.5px;padding:2px 8px;border-radius:99px;font-weight:600;white-space:nowrap}
@@ -317,20 +362,23 @@
   @media (max-width:640px){
     .month-cell{min-height:48px}
     header{padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top))}
+    .hero{padding:20px}
+    .hero-greeting{font-size:19px}
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>⚖️ Mon Régime <span>Dukan</span></h1>
+  <h1 id="brandHome" title="Retour à l'accueil" onclick="goToPage('accueil')">⚖️ Mon Régime <span>Dukan</span></h1>
   <div class="phase-pill" id="headerPhase">Phase non définie</div>
   <div class="header-spacer"></div>
   <button id="themeToggle" aria-label="Changer de thème" title="Changer de thème">🌙</button>
 </header>
 
 <nav class="top-nav">
-  <button class="nav-btn active" data-page="dashboard">📊 Tableau de bord</button>
+  <button class="nav-btn active" data-page="accueil">🏠 Accueil</button>
+  <button class="nav-btn" data-page="dashboard">📊 Tableau de bord</button>
   <button class="nav-btn" data-page="poids">⚖️ Poids &amp; mesures</button>
   <button class="nav-btn" data-page="journal">🍽️ Journal alimentaire</button>
   <button class="nav-btn" data-page="menus">📅 Menus</button>
@@ -342,10 +390,67 @@
 
 <main>
 
+<!-- ══════════ ACCUEIL (PAGE DE GARDE) ══════════ -->
+<section class="page active" id="page-accueil">
+  <div class="hero">
+    <div class="hero-greeting" id="heroGreeting">Bonjour 👋</div>
+    <div class="hero-date" id="heroDate"></div>
+    <div class="hero-phase" id="heroPhaseline" style="display:none"></div>
+    <div class="hero-stats" id="heroStats"></div>
+  </div>
+  <h2 style="margin-top:4px">Que voulez-vous faire ?</h2>
+  <div class="tile-grid">
+    <button type="button" class="tile" style="--tile-accent:var(--series-1)" onclick="goToPage('dashboard')">
+      <span class="tile-icon">📊</span>
+      <span class="tile-text"><span class="tile-title">Tableau de bord</span><span class="tile-desc">Vue d'ensemble de votre progression</span></span>
+      <span class="tile-arrow">→</span>
+    </button>
+    <button type="button" class="tile" style="--tile-accent:var(--series-3)" onclick="goToPage('poids')">
+      <span class="tile-icon">⚖️</span>
+      <span class="tile-text"><span class="tile-title">Poids &amp; mesures</span><span class="tile-desc">Pesées, courbe, tour de taille</span></span>
+      <span class="tile-arrow">→</span>
+    </button>
+    <button type="button" class="tile" style="--tile-accent:var(--series-2)" onclick="goToPage('journal')">
+      <span class="tile-icon">🍽️</span>
+      <span class="tile-text"><span class="tile-title">Journal alimentaire</span><span class="tile-desc">Repas, eau et calories du jour</span></span>
+      <span class="tile-arrow">→</span>
+    </button>
+    <button type="button" class="tile" style="--tile-accent:var(--badge-p4-fg)" onclick="goToPage('menus')">
+      <span class="tile-icon">📅</span>
+      <span class="tile-text"><span class="tile-title">Menus</span><span class="tile-desc">Planifiez vos repas jour/semaine/mois</span></span>
+      <span class="tile-arrow">→</span>
+    </button>
+    <button type="button" class="tile" style="--tile-accent:var(--badge-p3-fg)" onclick="goToPage('sport')">
+      <span class="tile-icon">🏃</span>
+      <span class="tile-text"><span class="tile-title">Sport</span><span class="tile-desc">Activités, pas et calories brûlées</span></span>
+      <span class="tile-arrow">→</span>
+    </button>
+    <button type="button" class="tile" style="--tile-accent:var(--badge-p2-fg)" onclick="goToPage('aliments')">
+      <span class="tile-icon">🥗</span>
+      <span class="tile-text"><span class="tile-title">Aliments Dukan</span><span class="tile-desc">308 aliments autorisés &amp; à éviter</span></span>
+      <span class="tile-arrow">→</span>
+    </button>
+    <button type="button" class="tile" style="--tile-accent:var(--muted)" onclick="goToPage('profil')">
+      <span class="tile-icon">⚙️</span>
+      <span class="tile-text"><span class="tile-title">Profil</span><span class="tile-desc">Vos infos, phases et métabolisme</span></span>
+      <span class="tile-arrow">→</span>
+    </button>
+    <button type="button" class="tile" style="--tile-accent:var(--critical)" onclick="goToPage('sauvegarde')">
+      <span class="tile-icon">💾</span>
+      <span class="tile-text"><span class="tile-title">Sauvegarde</span><span class="tile-desc">Exportez ou restaurez vos données</span></span>
+      <span class="tile-arrow">→</span>
+    </button>
+  </div>
+</section>
+
 <!-- ══════════ TABLEAU DE BORD ══════════ -->
-<section class="page active" id="page-dashboard">
+<section class="page" id="page-dashboard">
   <div class="pp-banner" id="dashBanner" style="display:none"></div>
   <div class="cards" id="dashCards"></div>
+  <div class="panel" id="progressPanel" style="display:none">
+    <h3>🏆 Votre progression depuis le début</h3>
+    <div id="progressSummary"></div>
+  </div>
   <div class="panel">
     <h3>📉 Évolution du poids</h3>
     <div class="chart-wrap" id="weightChartDash"></div>
@@ -379,6 +484,15 @@
   <div class="panel">
     <h3>📉 Courbe de poids</h3>
     <div class="chart-wrap" id="weightChartFull"></div>
+  </div>
+  <div class="panel" id="bodyChartPanel" style="display:none">
+    <h3>📏 Tour de taille & de hanches</h3>
+    <div class="chart-wrap" id="bodyChartFull"></div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--series-1)"></span> Tour de taille</span>
+      <span><span class="dot" style="background:var(--series-3)"></span> Tour de hanches</span>
+    </div>
+    <p style="font-size:12.5px;color:var(--muted);margin-top:10px" id="whrText"></p>
   </div>
   <div class="panel">
     <h3>📋 Historique des pesées</h3>
@@ -621,7 +735,8 @@
 </main>
 
 <nav class="bottom-nav">
-  <button class="nav-btn active" data-page="dashboard" aria-label="Tableau de bord" title="Tableau de bord">📊</button>
+  <button class="nav-btn active" data-page="accueil" aria-label="Accueil" title="Accueil">🏠</button>
+  <button class="nav-btn" data-page="dashboard" aria-label="Tableau de bord" title="Tableau de bord">📊</button>
   <button class="nav-btn" data-page="poids" aria-label="Poids et mesures" title="Poids et mesures">⚖️</button>
   <button class="nav-btn" data-page="journal" aria-label="Journal alimentaire" title="Journal alimentaire">🍽️</button>
   <button class="nav-btn" data-page="menus" aria-label="Menus" title="Menus">📅</button>
@@ -796,7 +911,141 @@ const FOODS = [
   {n:"Riz complet (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:130,pr:2.7,p:4},
   {n:"Pâtes complètes (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:124,pr:5,p:4},
   {n:"Pommes de terre (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:77,pr:2,p:4},
-  {n:"Lentilles cuites (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:116,pr:9,p:4}
+  {n:"Lentilles cuites (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:116,pr:9,p:4},
+
+  // ═══ Ajouts : Viande (gibier & pièces maigres supplémentaires) ═══
+  {n:"Viande de bison",c:"Viande",k:120,pr:22,p:1},{n:"Viande de kangourou",c:"Viande",k:110,pr:22,p:1},
+  {n:"Chevreuil (gibier)",c:"Viande",k:120,pr:22,p:1},{n:"Sanglier maigre (gibier)",c:"Viande",k:140,pr:21,p:1},
+  {n:"Cœur de bœuf",c:"Viande",k:110,pr:17,p:1},{n:"Jarret de veau",c:"Viande",k:110,pr:20,p:1},
+  {n:"Paleron de bœuf maigre",c:"Viande",k:145,pr:20,p:1},{n:"Aiguillette de bœuf",c:"Viande",k:125,pr:21,p:1},
+
+  // ═══ Ajouts : Volailles ═══
+  {n:"Poulet fermier (sans peau)",c:"Volaille",k:120,pr:23,p:1},{n:"Cuisse de poulet (sans peau)",c:"Volaille",k:130,pr:21,p:1},
+  {n:"Chapon (sans peau)",c:"Volaille",k:130,pr:22,p:1},{n:"Faisan",c:"Volaille",k:130,pr:23,p:1},
+  {n:"Perdrix",c:"Volaille",k:120,pr:23,p:1},{n:"Cuisse de dinde (sans peau)",c:"Volaille",k:120,pr:21,p:1},
+
+  // ═══ Ajouts : Poissons ═══
+  {n:"Bar d'élevage",c:"Poisson",k:100,pr:18,p:1},{n:"Carpe",c:"Poisson",k:110,pr:18,p:1},
+  {n:"Brochet",c:"Poisson",k:90,pr:19,p:1},{n:"Perche",c:"Poisson",k:90,pr:19,p:1},
+  {n:"Sandre",c:"Poisson",k:90,pr:19,p:1},{n:"Tilapia",c:"Poisson",k:95,pr:20,p:1},
+  {n:"Panga",c:"Poisson",k:90,pr:15,p:1},{n:"Roussette (saumonette)",c:"Poisson",k:90,pr:17,p:1},
+  {n:"Grenadier",c:"Poisson",k:85,pr:17,p:1},{n:"Lingue (julienne)",c:"Poisson",k:85,pr:18,p:1},
+  {n:"Rascasse",c:"Poisson",k:90,pr:18,p:1},{n:"Congre",c:"Poisson",k:100,pr:18,p:1},
+  {n:"Vivaneau",c:"Poisson",k:100,pr:20,p:1},{n:"Mulet",c:"Poisson",k:120,pr:19,p:1},
+  {n:"Poisson-chat",c:"Poisson",k:105,pr:16,p:1},{n:"Truite saumonée",c:"Poisson",k:140,pr:20,p:1},
+
+  // ═══ Ajouts : Fruits de mer ═══
+  {n:"Pétoncles",c:"Fruits de mer",k:85,pr:17,p:1},{n:"Couteaux (fruits de mer)",c:"Fruits de mer",k:80,pr:14,p:1},
+  {n:"Oursin",c:"Fruits de mer",k:100,pr:15,p:1},{n:"Escargots (sans beurre)",c:"Fruits de mer",k:90,pr:16,p:1},
+  {n:"Encornets",c:"Fruits de mer",k:80,pr:15,p:1},
+
+  // ═══ Ajouts : Œufs ═══
+  {n:"Œuf dur",c:"Œufs",k:140,pr:13,p:1},{n:"Œuf mollet",c:"Œufs",k:140,pr:13,p:1},
+  {n:"Œuf poché",c:"Œufs",k:140,pr:13,p:1},{n:"Omelette nature (sans matière grasse)",c:"Œufs",k:145,pr:12,p:1},
+
+  // ═══ Ajouts : Laitages 0% ═══
+  {n:"Cottage cheese 0%",c:"Laitage 0%",k:70,pr:11,p:1},{n:"Kéfir de lait 0%",c:"Laitage 0%",k:40,pr:3.5,p:1},
+  {n:"Babeurre 0%",c:"Laitage 0%",k:35,pr:3.3,p:1},{n:"Yaourt à boire 0%",c:"Laitage 0%",k:45,pr:3.5,p:1},
+  {n:"Fromage frais ail et fines herbes 0%",c:"Laitage 0%",k:55,pr:8,p:1},
+
+  // ═══ Ajouts : Protéines végétales ═══
+  {n:"Edamame",c:"Protéine végétale",k:120,pr:11,p:1},{n:"Protéines de pois texturées",c:"Protéine végétale",k:330,pr:52,p:1},
+  {n:"Steak végétal maigre (simili-carné)",c:"Protéine végétale",k:130,pr:18,p:1},
+
+  // ═══ Ajouts : Légumes (dès la Croisière, jours PL) ═══
+  {n:"Épinards surgelés",c:"Légume",k:23,pr:2.9,p:2},{n:"Haricots beurre",c:"Légume",k:30,pr:1.8,p:2},
+  {n:"Salsifis",c:"Légume",k:60,pr:2.5,p:2},{n:"Rutabaga",c:"Légume",k:35,pr:1.1,p:2},
+  {n:"Panais",c:"Légume",k:65,pr:1.5,p:2},{n:"Chou romanesco",c:"Légume",k:30,pr:2.8,p:2},
+  {n:"Chou kale",c:"Légume",k:35,pr:3,p:2},{n:"Chou chinois (pak-choï)",c:"Légume",k:15,pr:1.5,p:2},
+  {n:"Pousses de bambou",c:"Légume",k:20,pr:2,p:2},{n:"Algues nori (déshydratées)",c:"Légume",k:35,pr:6,p:2},
+  {n:"Algue wakamé",c:"Légume",k:45,pr:3,p:2},{n:"Cresson",c:"Légume",k:12,pr:2.3,p:2},
+  {n:"Roquette",c:"Légume",k:18,pr:2.6,p:2},{n:"Mâche",c:"Légume",k:14,pr:2,p:2},
+  {n:"Pourpier",c:"Légume",k:16,pr:1.3,p:2},{n:"Bettes à cardes",c:"Légume",k:20,pr:1.8,p:2},
+  {n:"Courge spaghetti",c:"Légume",k:22,pr:0.6,p:2},{n:"Chayote",c:"Légume",k:19,pr:0.8,p:2},
+  {n:"Céleri-rave",c:"Légume",k:35,pr:1.5,p:2},{n:"Tomates cerises",c:"Légume",k:18,pr:0.9,p:2},
+  {n:"Tomates séchées (sans huile)",c:"Légume",k:80,pr:4,p:2},{n:"Champignons de Paris",c:"Légume",k:22,pr:3,p:2},
+  {n:"Pleurotes",c:"Légume",k:33,pr:3,p:2},{n:"Shiitake",c:"Légume",k:34,pr:2.2,p:2},
+  {n:"Girolles",c:"Légume",k:25,pr:2.5,p:2},{n:"Cèpes",c:"Légume",k:25,pr:3,p:2},
+  {n:"Poivron rouge",c:"Légume",k:26,pr:1,p:2},{n:"Poivron jaune",c:"Légume",k:27,pr:1,p:2},
+
+  // ═══ Ajouts : Boissons ═══
+  {n:"Thé vert",c:"Boisson",k:0,pr:0,p:1},{n:"Thé noir",c:"Boisson",k:0,pr:0,p:1},
+  {n:"Tisane / infusion",c:"Boisson",k:0,pr:0,p:1},{n:"Bouillon de légumes (sans matière grasse)",c:"Boisson",k:5,pr:0.3,p:1},
+  {n:"Bouillon de volaille dégraissé",c:"Boisson",k:10,pr:1,p:1},{n:"Eau aromatisée sans sucre",c:"Boisson",k:0,pr:0,p:1},
+  {n:"Café décaféiné",c:"Boisson",k:0,pr:0,p:1},
+
+  // ═══ Ajouts : Indispensables ═══
+  {n:"Psyllium (fibres)",c:"Indispensable",k:210,pr:3,p:1},{n:"Agar-agar",c:"Indispensable",k:25,pr:2,p:1},
+  {n:"Gélatine alimentaire",c:"Indispensable",k:335,pr:84,p:1},
+
+  // ═══ Ajouts : Tolérés (max 2/jour) ═══
+  {n:"Moutarde",c:"Toléré",k:60,pr:4,p:3},{n:"Vinaigre (tous types)",c:"Toléré",k:20,pr:0,p:3},
+  {n:"Câpres",c:"Toléré",k:25,pr:2,p:3},{n:"Sauce soja allégée",c:"Toléré",k:55,pr:6,p:3},
+  {n:"Ketchup light (1 c.à.s.)",c:"Toléré",k:70,pr:1,p:3},{n:"Mayonnaise allégée 5% (1 c.à.s.)",c:"Toléré",k:150,pr:1,p:3},
+  {n:"Compote sans sucre ajouté (toléré)",c:"Toléré",k:50,pr:0.3,p:3},{n:"Gélatine light aromatisée (dessert 0%)",c:"Toléré",k:35,pr:5,p:3},
+  {n:"Chewing-gum sans sucre",c:"Toléré",k:0,pr:0,p:3},{n:"Édulcorant de table",c:"Toléré",k:0,pr:0,p:3},
+  {n:"Vinaigrette allégée maison (1 c.à.s.)",c:"Toléré",k:40,pr:0,p:3},{n:"Sirop 0% calorie (1 c.à.s.)",c:"Toléré",k:5,pr:0,p:3},
+  {n:"Fromage à tartiner 0% (toléré)",c:"Toléré",k:70,pr:9,p:3},{n:"Pickles (légumes au vinaigre)",c:"Toléré",k:15,pr:0.5,p:3},
+  {n:"Algues déshydratées (assaisonnement, toléré)",c:"Toléré",k:35,pr:5,p:3},{n:"Ricotta allégée (toléré)",c:"Toléré",k:120,pr:9,p:3},
+  {n:"Mozzarella allégée (toléré, 30 g)",c:"Toléré",k:170,pr:22,p:3},{n:"Œufs de saumon (toléré)",c:"Toléré",k:250,pr:27,p:3},
+  {n:"Tarama allégé (toléré)",c:"Toléré",k:200,pr:5,p:3},{n:"Levure maltée (toléré)",c:"Toléré",k:340,pr:45,p:3},
+
+  // ═══ Ajouts : Fruits (réintroduction, Consolidation) ═══
+  {n:"Orange (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:47,pr:0.9,p:4},
+  {n:"Clémentine (2 fruits, Consolidation)",c:"Fruit (réintroduction)",k:47,pr:0.8,p:4},
+  {n:"Pamplemousse (1/2, Consolidation)",c:"Fruit (réintroduction)",k:42,pr:0.8,p:4},
+  {n:"Prune (Consolidation)",c:"Fruit (réintroduction)",k:46,pr:0.7,p:4},
+  {n:"Cerises (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:63,pr:1,p:4},
+  {n:"Abricot (Consolidation)",c:"Fruit (réintroduction)",k:48,pr:1.4,p:4},
+  {n:"Ananas (1 tranche, Consolidation)",c:"Fruit (réintroduction)",k:50,pr:0.5,p:4},
+  {n:"Mangue (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:60,pr:0.8,p:4},
+  {n:"Framboises (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:52,pr:1.2,p:4},
+  {n:"Myrtilles (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:57,pr:0.7,p:4},
+  {n:"Mandarine (Consolidation)",c:"Fruit (réintroduction)",k:53,pr:0.8,p:4},
+  {n:"Nectarine (Consolidation)",c:"Fruit (réintroduction)",k:44,pr:1.1,p:4},
+
+  // ═══ Ajouts : Féculents & légumineuses (réintroduction, Stabilisation) ═══
+  {n:"Pain complet aux céréales (2 tranches, Consolidation)",c:"Féculent (réintroduction)",k:260,pr:10,p:4},
+  {n:"Boulgour (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:120,pr:4,p:4},
+  {n:"Quinoa (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:120,pr:4.4,p:4},
+  {n:"Sarrasin / blé noir (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:110,pr:3.7,p:4},
+  {n:"Semoule complète (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:115,pr:3.8,p:4},
+  {n:"Petits pois (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:80,pr:5.4,p:4},
+  {n:"Flageolets (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:100,pr:7,p:4},
+  {n:"Pois chiches cuits (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:120,pr:7,p:4},
+  {n:"Haricots rouges cuits (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:110,pr:7,p:4},
+  {n:"Haricots blancs cuits (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:100,pr:7,p:4},
+
+  // ═══ Ajouts : Fromages (réintroduction, Consolidation) ═══
+  {n:"Camembert (30 g, Consolidation)",c:"Fromage (réintroduction)",k:300,pr:20,p:4},
+  {n:"Chèvre frais (30 g, Consolidation)",c:"Fromage (réintroduction)",k:260,pr:18,p:4},
+  {n:"Comté (30 g, Consolidation)",c:"Fromage (réintroduction)",k:410,pr:28,p:4},
+  {n:"Mozzarella (30 g, Consolidation)",c:"Fromage (réintroduction)",k:280,pr:22,p:4},
+
+  // ═══ Ajouts : Déclinaisons aromatisées des laitages 0% (sans sucre) ═══
+  {n:"Skyr à la mangue 0%",c:"Laitage 0%",k:70,pr:9,p:1},{n:"Skyr à la fraise 0%",c:"Laitage 0%",k:66,pr:9.5,p:1},
+  {n:"Skyr à la vanille 0%",c:"Laitage 0%",k:68,pr:10,p:1},{n:"Skyr au citron 0%",c:"Laitage 0%",k:65,pr:10,p:1},
+  {n:"Skyr à la pêche 0%",c:"Laitage 0%",k:68,pr:9.5,p:1},{n:"Skyr aux fruits rouges 0%",c:"Laitage 0%",k:67,pr:9.5,p:1},
+  {n:"Skyr à la myrtille 0%",c:"Laitage 0%",k:68,pr:9.5,p:1},{n:"Skyr au café 0%",c:"Laitage 0%",k:65,pr:10,p:1},
+  {n:"Yaourt à la vanille 0% (sans sucre)",c:"Laitage 0%",k:46,pr:4.8,p:1},{n:"Yaourt au citron 0% (sans sucre)",c:"Laitage 0%",k:44,pr:4.8,p:1},
+  {n:"Yaourt à la fraise 0% (sans sucre)",c:"Laitage 0%",k:47,pr:4.6,p:1},{n:"Yaourt à la pêche 0% (sans sucre)",c:"Laitage 0%",k:47,pr:4.6,p:1},
+  {n:"Yaourt à la noix de coco 0% (sans sucre)",c:"Laitage 0%",k:50,pr:4.5,p:1},{n:"Yaourt au café 0% (sans sucre)",c:"Laitage 0%",k:45,pr:4.8,p:1},
+  {n:"Yaourt à la framboise 0% (sans sucre)",c:"Laitage 0%",k:47,pr:4.6,p:1},{n:"Yaourt à l'abricot 0% (sans sucre)",c:"Laitage 0%",k:48,pr:4.5,p:1},
+  {n:"Fromage blanc à la vanille 0% (sans sucre)",c:"Laitage 0%",k:55,pr:7.5,p:1},{n:"Fromage blanc aux fruits rouges 0% (sans sucre)",c:"Laitage 0%",k:58,pr:7,p:1},
+  {n:"Fromage blanc au citron 0% (sans sucre)",c:"Laitage 0%",k:55,pr:7.5,p:1},{n:"Fromage blanc à la mangue 0% (sans sucre)",c:"Laitage 0%",k:58,pr:7,p:1},
+  {n:"Petits-suisses à la vanille 0% (sans sucre)",c:"Laitage 0%",k:55,pr:7.5,p:1},{n:"Petits-suisses aux fruits 0% (sans sucre)",c:"Laitage 0%",k:58,pr:7,p:1},
+  {n:"Yaourt à la grecque citron 0%",c:"Laitage 0%",k:58,pr:6.8,p:1},{n:"Yaourt à la grecque vanille 0%",c:"Laitage 0%",k:60,pr:6.8,p:1},
+  {n:"Yaourt à boire à la fraise 0%",c:"Laitage 0%",k:48,pr:3.3,p:1},{n:"Yaourt à boire à la pêche 0%",c:"Laitage 0%",k:48,pr:3.3,p:1},
+  {n:"Kéfir de lait à la vanille 0%",c:"Laitage 0%",k:42,pr:3.5,p:1},
+
+  // ═══ Ajouts : Déclinaisons des compotes sans sucre ajouté (toléré) ═══
+  {n:"Compote de pomme sans sucre ajouté",c:"Toléré",k:48,pr:0.3,p:3},{n:"Compote de poire sans sucre ajouté",c:"Toléré",k:50,pr:0.3,p:3},
+  {n:"Compote pomme-fraise sans sucre ajouté",c:"Toléré",k:48,pr:0.3,p:3},{n:"Compote pomme-pêche sans sucre ajouté",c:"Toléré",k:48,pr:0.3,p:3},
+  {n:"Compote pomme-abricot sans sucre ajouté",c:"Toléré",k:50,pr:0.4,p:3},{n:"Compote de pruneau sans sucre ajouté",c:"Toléré",k:70,pr:0.6,p:3},
+
+  // ═══ Ajouts : Déclinaisons infusions & thés ═══
+  {n:"Thé vert à la menthe",c:"Boisson",k:0,pr:0,p:1},{n:"Thé vert au citron",c:"Boisson",k:0,pr:0,p:1},
+  {n:"Tisane à la verveine",c:"Boisson",k:0,pr:0,p:1},{n:"Tisane au fenouil",c:"Boisson",k:0,pr:0,p:1}
 ];
 
 /* ═══════════════════ ALIMENTS À ÉVITER ═══════════════════ */
@@ -948,6 +1197,39 @@ function weeklyRate(){
   if(days<=0) return null;
   return (last.poids-ref.poids)/days*7;
 }
+/* Mesures corporelles (tour de taille / hanches) */
+function bodyMeasurements(){
+  return sortedWeights().filter(w=>w.taille||w.hanches);
+}
+/* Ratio tour de taille / tour de hanches — repère indicatif (OMS : risque accru ≥0,90 homme, ≥0,85 femme) */
+function whr(){
+  const m=[...bodyMeasurements()].reverse().find(w=>w.taille&&w.hanches);
+  if(!m) return null;
+  return m.taille/m.hanches;
+}
+function whrLabel(ratio){
+  const sexe=state.profile.sexe;
+  const seuil = sexe==="H" ? 0.90 : sexe==="F" ? 0.85 : 0.88;
+  return ratio>=seuil ? "à surveiller (repère OMS)" : "dans la moyenne (repère OMS)";
+}
+/* Résumé de progression depuis le début du suivi */
+function progressSummary(){
+  const p=state.profile, w=currentWeight();
+  const bm=bodyMeasurements();
+  const firstTaille=bm.find(x=>x.taille), lastTaille=[...bm].reverse().find(x=>x.taille);
+  const firstHanches=bm.find(x=>x.hanches), lastHanches=[...bm].reverse().find(x=>x.hanches);
+  const hasAny = (p.depart&&w) || (firstTaille&&lastTaille&&firstTaille!==lastTaille) || p.debut || state.sports.length || Object.keys(state.journal).length;
+  if(!hasAny) return null;
+  return {
+    kgPerdus: (p.depart&&w) ? (p.depart-w) : null,
+    cmTaillePerdus: (firstTaille&&lastTaille&&firstTaille!==lastTaille) ? (firstTaille.taille-lastTaille.taille) : null,
+    cmHanchesPerdus: (firstHanches&&lastHanches&&firstHanches!==lastHanches) ? (firstHanches.hanches-lastHanches.hanches) : null,
+    jours: p.debut ? daysBetween(p.debut,todayStr())+1 : null,
+    pesees: state.weights.length,
+    joursJournal: Object.keys(state.journal).length,
+    seancesSport: state.sports.length
+  };
+}
 /* Alertes de conformité Dukan : aliment non protéiné un jour PP, plus de 2 aliments "tolérés", ou aliment habituellement déconseillé */
 function complianceWarnings(dateStr){
   const warnings=[];
@@ -1064,6 +1346,63 @@ function renderWeightChart(container, height){
   svg.addEventListener("touchend", hide);
 }
 
+/* ═══════════════════ GRAPHIQUE TOUR DE TAILLE / HANCHES (SVG) ═══════════════════ */
+function renderBodyChart(container, height){
+  const el=document.getElementById(container);
+  const data=bodyMeasurements();
+  if(data.length<2){ el.innerHTML='<p class="empty">Ajoutez au moins deux mesures (tour de taille ou hanches) pour voir la courbe.</p>'; return; }
+  const W=Math.max(el.clientWidth||600,320), H=height, padL=40, padR=14, padT=14, padB=26;
+  const xs=data.map(d=>strToDate(d.date).getTime());
+  const tailleVals=data.filter(d=>d.taille).map(d=>d.taille);
+  const hanchesVals=data.filter(d=>d.hanches).map(d=>d.hanches);
+  const allVals=[...tailleVals,...hanchesVals];
+  let ymin=Math.min(...allVals), ymax=Math.max(...allVals);
+  const pad=(ymax-ymin)*0.15||2; ymin-=pad; ymax+=pad;
+  const x0=Math.min(...xs), x1=Math.max(...xs);
+  const X=t=>padL+(t-x0)/(x1-x0||1)*(W-padL-padR);
+  const Y=v=>padT+(ymax-v)/(ymax-ymin)*(H-padT-padB);
+  let g="";
+  for(let i=0;i<=3;i++){
+    const v=ymin+(ymax-ymin)*i/3, y=Y(v);
+    g+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--grid)" stroke-width="1"/>`;
+    g+=`<text x="${padL-7}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--muted)">${Math.round(v)}</text>`;
+  }
+  const step=Math.max(1,Math.ceil(data.length/6));
+  data.forEach((d,i)=>{
+    if(i%step===0||i===data.length-1)
+      g+=`<text x="${X(xs[i])}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${fmtDM(d.date)}</text>`;
+  });
+  function drawLine(key,color){
+    const pts=data.map((d,i)=>d[key]?[X(xs[i]),Y(d[key])]:null).filter(Boolean);
+    if(pts.length<2) return;
+    g+=`<polyline points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    pts.forEach(p=>{ g+=`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="${color}" stroke="var(--surface-1)" stroke-width="2"/>`; });
+  }
+  drawLine("taille","var(--series-1)");
+  drawLine("hanches","var(--series-3)");
+  el.innerHTML=`<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">${g}
+    <line id="${container}-cross" x1="0" y1="${padT}" x2="0" y2="${H-padB}" stroke="var(--baseline)" stroke-width="1" style="display:none"/>
+  </svg><div class="chart-tip" id="${container}-tip"></div>`;
+  const svg=el.querySelector("svg"), tip=document.getElementById(container+"-tip"), cross=document.getElementById(container+"-cross");
+  function moveAt(clientX){
+    const r=svg.getBoundingClientRect();
+    const mx=(clientX-r.left)*(W/r.width);
+    let best=0,bd=Infinity;
+    xs.forEach((t,i)=>{ const d=Math.abs(X(t)-mx); if(d<bd){bd=d;best=i;} });
+    const d=data[best];
+    cross.style.display="block"; cross.setAttribute("x1",X(xs[best])); cross.setAttribute("x2",X(xs[best]));
+    tip.style.display="block";
+    tip.style.left=(X(xs[best])/W*100)+"%"; tip.style.top="15%";
+    tip.innerHTML=`<strong>${fmtShort(d.date)}</strong>`+(d.taille?`<br>Taille ${d.taille} cm`:"")+(d.hanches?`<br>Hanches ${d.hanches} cm`:"");
+  }
+  function hide(){ tip.style.display="none"; cross.style.display="none"; }
+  svg.addEventListener("mousemove", ev=>moveAt(ev.clientX));
+  svg.addEventListener("mouseleave", hide);
+  svg.addEventListener("touchstart", ev=>{ moveAt(ev.touches[0].clientX); }, {passive:true});
+  svg.addEventListener("touchmove", ev=>{ moveAt(ev.touches[0].clientX); }, {passive:true});
+  svg.addEventListener("touchend", hide);
+}
+
 /* ═══════════════════ GRAPHIQUE CALORIES 7 JOURS ═══════════════════ */
 function renderCalChart(){
   const el=document.getElementById("calChart");
@@ -1112,7 +1451,48 @@ function renderCalChart(){
   svg.addEventListener("touchend",()=>tip.style.display="none");
 }
 
+/* ═══════════════════ ACCUEIL (PAGE DE GARDE) ═══════════════════ */
+function renderAccueil(){
+  const p=state.profile, w=currentWeight(), t=todayStr();
+  const hour=new Date().getHours();
+  const salut = hour<5 ? "Bonsoir" : hour<12 ? "Bonjour" : hour<18 ? "Bon après-midi" : "Bonsoir";
+  document.getElementById("heroGreeting").textContent = p.nom ? `${salut}, ${p.nom} 👋` : `${salut} 👋`;
+  document.getElementById("heroDate").textContent = fmtLong(t);
+  const phaseLine=document.getElementById("heroPhaseline");
+  if(p.phase>=1&&p.phase<=4){
+    const dt=dayType(t);
+    phaseLine.style.display="inline-flex";
+    phaseLine.innerHTML = phaseName(p.phase) + (dt ? ` · aujourd'hui : <strong>${dt}</strong>` : "");
+  } else phaseLine.style.display="none";
+  const stats=[];
+  stats.push({label:"Poids actuel",value:w?w.toFixed(1)+" kg":"—"});
+  if(p.cible) stats.push({label:"Objectif",value:p.cible+" kg"});
+  if(p.debut) stats.push({label:"Jour du régime",value:String(daysBetween(p.debut,t)+1)});
+  stats.push({label:"Aujourd'hui",value:journalKcal(t)+" kcal"});
+  document.getElementById("heroStats").innerHTML = stats.map(s=>
+    `<div class="hero-stat"><span class="hs-label">${s.label}</span><span class="hs-value">${s.value}</span></div>`).join("");
+}
+
 /* ═══════════════════ TABLEAU DE BORD ═══════════════════ */
+function renderProgress(){
+  const panel=document.getElementById("progressPanel");
+  const s=progressSummary();
+  if(!s){ panel.style.display="none"; return; }
+  const items=[];
+  if(s.kgPerdus!=null) items.push({label:"Poids",value:(s.kgPerdus>=0?"−":"+")+Math.abs(s.kgPerdus).toFixed(1)+" kg"});
+  if(s.cmTaillePerdus!=null) items.push({label:"Tour de taille",value:(s.cmTaillePerdus>=0?"−":"+")+Math.abs(s.cmTaillePerdus).toFixed(1)+" cm"});
+  if(s.cmHanchesPerdus!=null) items.push({label:"Tour de hanches",value:(s.cmHanchesPerdus>=0?"−":"+")+Math.abs(s.cmHanchesPerdus).toFixed(1)+" cm"});
+  if(s.jours!=null) items.push({label:"Jours de régime",value:String(s.jours)});
+  items.push({label:"Pesées enregistrées",value:String(s.pesees)});
+  items.push({label:"Jours de journal",value:String(s.joursJournal)});
+  items.push({label:"Séances de sport",value:String(s.seancesSport)});
+  if(!items.length){ panel.style.display="none"; return; }
+  panel.style.display="block";
+  document.getElementById("progressSummary").innerHTML=`
+    <div class="cards" style="margin-bottom:0">
+      ${items.map(it=>`<div class="card"><div class="label">${it.label}</div><div class="value">${it.value}</div></div>`).join("")}
+    </div>`;
+}
 function renderDashboard(){
   const p=state.profile, w=currentWeight(), t=todayStr();
   // bannière du jour
@@ -1151,6 +1531,7 @@ function renderDashboard(){
   document.getElementById("dashCards").innerHTML=cards.map(c=>
     `<div class="card"><div class="label">${c.label}</div><div class="value">${c.value}</div>
      ${c.sub?`<div class="sub ${c.cls||""}">${c.sub}</div>`:""}</div>`).join("");
+  renderProgress();
   renderWeightChart("weightChartDash",210);
   renderCalChart();
   // aujourd'hui : menu + repas + sport
@@ -1198,9 +1579,20 @@ function editWeight(date){
   document.getElementById("page-poids").scrollIntoView({behavior:"smooth",block:"start"});
   toast("Modifiez les valeurs puis enregistrez.");
 }
+function renderBodyPanel(){
+  const panel=document.getElementById("bodyChartPanel");
+  if(bodyMeasurements().length<2){ panel.style.display="none"; return; }
+  panel.style.display="block";
+  renderBodyChart("bodyChartFull",230);
+  const ratio=whr();
+  document.getElementById("whrText").innerHTML = ratio
+    ? `Ratio tour de taille / tour de hanches : <strong>${ratio.toFixed(2)}</strong> — ${whrLabel(ratio)}. Repère indicatif de l'OMS, ne remplace pas un avis médical.`
+    : "Renseignez le tour de taille et le tour de hanches sur une même pesée pour calculer votre ratio.";
+}
 function renderPoids(){
   document.getElementById("wDate").value ||= todayStr();
   renderWeightChart("weightChartFull",290);
+  renderBodyPanel();
   const data=sortedWeights().slice().reverse();
   const tbl=document.getElementById("weightTable");
   if(!data.length){ tbl.innerHTML='<tr><td class="empty">Aucune pesée enregistrée pour l\'instant.</td></tr>'; return; }
@@ -1586,7 +1978,7 @@ function renderAliments(){
     (!q||f.n.toLowerCase().includes(q))&&(!cat||f.c===cat)&&(!ph||String(f.p)===ph));
   const badge=p=>p===1?'<span class="badge p1">Dès l\'Attaque</span>':p===2?'<span class="badge p2">Dès la Croisière</span>':p===3?'<span class="badge p3">Toléré</span>':'<span class="badge p4">Réintroduction</span>';
   document.getElementById("foodGrid").innerHTML = list.length ? list.map(f=>`
-    <div class="food-item">
+    <div class="food-item p${f.p}">
       <div><div class="fname">${f.n}</div><div class="fmeta">${f.c} · ${f.k} kcal · ${f.pr} g prot. /100 g</div></div>
       ${badge(f.p)}
     </div>`).join("") : '<p class="empty">Aucun aliment ne correspond à votre recherche.</p>';
@@ -1742,6 +2134,7 @@ document.getElementById("importFile").addEventListener("change",e=>{
 function renderAll(){
   document.getElementById("headerPhase").textContent=phaseName(state.profile.phase);
   const active=document.querySelector(".page.active").id;
+  if(active==="page-accueil") renderAccueil();
   if(active==="page-dashboard") renderDashboard();
   if(active==="page-poids") renderPoids();
   if(active==="page-journal") renderJournal();
