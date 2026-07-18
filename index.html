@@ -278,8 +278,9 @@
   .chart-wrap{position:relative}
   .chart-tip{
     position:absolute;pointer-events:none;background:var(--ink);color:var(--page);
-    padding:6px 10px;border-radius:8px;font-size:12.5px;white-space:nowrap;
+    padding:7px 11px;border-radius:9px;font-size:12.5px;white-space:nowrap;
     transform:translate(-50%,-115%);display:none;z-index:5;line-height:1.5;
+    box-shadow:0 4px 14px rgba(11,11,11,.18);
   }
   .datenav{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
   .datenav .title{font-weight:700;font-size:16px;min-width:210px;text-transform:capitalize}
@@ -329,6 +330,11 @@
   .food-item.p4{border-left-color:var(--badge-p4-fg)}
   .food-item .fname{font-size:13.5px;font-weight:600}
   .food-item .fmeta{font-size:11.5px;color:var(--muted)}
+  .food-item .fmacros{display:flex;gap:7px;margin-top:4px}
+  .food-item .fmacros span{font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:6px}
+  .food-item .fm-p{background:var(--badge-p1-bg);color:var(--badge-p1-fg)}
+  .food-item .fm-g{background:var(--badge-p3-bg);color:var(--badge-p3-fg)}
+  .food-item .fm-l{background:var(--badge-x-bg);color:var(--badge-x-fg)}
   .badge{font-size:10.5px;padding:2px 8px;border-radius:99px;font-weight:600;white-space:nowrap}
   .badge.p1{background:var(--badge-p1-bg);color:var(--badge-p1-fg)}
   .badge.p2{background:var(--badge-p2-bg);color:var(--badge-p2-fg)}
@@ -538,6 +544,10 @@
   </div>
   <div id="journalMeals"></div>
   <div class="cards" id="journalTotals"></div>
+  <div class="panel" id="macroPanel" style="display:none">
+    <h3>🥧 Répartition des macronutriments</h3>
+    <div id="macroChart"></div>
+  </div>
 </section>
 
 <!-- ══════════ MENUS ══════════ -->
@@ -824,228 +834,228 @@ function daysBetween(a,b){ return Math.round((strToDate(b)-strToDate(a))/8640000
 /* k = kcal/100g · pr = protéines g/100g (estimation indicative) */
 const FOODS = [
   // Viandes maigres
-  {n:"Steak de bœuf (5% MG)",c:"Viande",k:130,pr:21,p:1},{n:"Filet de bœuf",c:"Viande",k:140,pr:21,p:1},
-  {n:"Rosbif",c:"Viande",k:120,pr:22,p:1},{n:"Bavette",c:"Viande",k:135,pr:21,p:1},
-  {n:"Escalope de veau",c:"Viande",k:110,pr:21,p:1},{n:"Rognons de veau",c:"Viande",k:100,pr:17,p:1},
-  {n:"Foie de veau",c:"Viande",k:135,pr:20,p:1},{n:"Foie de volaille",c:"Viande",k:125,pr:18,p:1},
-  {n:"Lapin",c:"Viande",k:135,pr:21,p:1},{n:"Viande de cheval",c:"Viande",k:110,pr:21,p:1},
-  {n:"Jambon blanc dégraissé",c:"Viande",k:110,pr:20,p:1},{n:"Bresaola (viande des Grisons)",c:"Viande",k:150,pr:32,p:1},
-  {n:"Steak haché 5%",c:"Viande",k:130,pr:20,p:1},{n:"Langue de veau",c:"Viande",k:130,pr:16,p:1},
-  {n:"Onglet",c:"Viande",k:125,pr:21,p:1},{n:"Tartare de bœuf maigre",c:"Viande",k:125,pr:21,p:1},
-  {n:"Jambon cru dégraissé (gras retiré)",c:"Viande",k:140,pr:24,p:1},
+  {n:"Steak de bœuf (5% MG)",c:"Viande",k:130,pr:21,gl:0,li:5,p:1},{n:"Filet de bœuf",c:"Viande",k:140,pr:21,gl:0,li:6,p:1},
+  {n:"Rosbif",c:"Viande",k:120,pr:22,gl:0,li:3,p:1},{n:"Bavette",c:"Viande",k:135,pr:21,gl:0,li:6,p:1},
+  {n:"Escalope de veau",c:"Viande",k:110,pr:21,gl:0,li:3,p:1},{n:"Rognons de veau",c:"Viande",k:100,pr:17,gl:0,li:3,p:1},
+  {n:"Foie de veau",c:"Viande",k:135,pr:20,gl:3,li:4,p:1},{n:"Foie de volaille",c:"Viande",k:125,pr:18,gl:1,li:5,p:1},
+  {n:"Lapin",c:"Viande",k:135,pr:21,gl:0,li:5,p:1},{n:"Viande de cheval",c:"Viande",k:110,pr:21,gl:0,li:3,p:1},
+  {n:"Jambon blanc dégraissé",c:"Viande",k:110,pr:20,gl:1,li:2,p:1},{n:"Bresaola (viande des Grisons)",c:"Viande",k:150,pr:32,gl:0.5,li:3,p:1},
+  {n:"Steak haché 5%",c:"Viande",k:130,pr:20,gl:0,li:5,p:1},{n:"Langue de veau",c:"Viande",k:130,pr:16,gl:0.5,li:9,p:1},
+  {n:"Onglet",c:"Viande",k:125,pr:21,gl:0,li:6,p:1},{n:"Tartare de bœuf maigre",c:"Viande",k:125,pr:21,gl:0,li:5,p:1},
+  {n:"Jambon cru dégraissé (gras retiré)",c:"Viande",k:140,pr:24,gl:0.5,li:6,p:1},
   // Volailles
-  {n:"Poulet (sans peau)",c:"Volaille",k:120,pr:23,p:1},{n:"Escalope de dinde",c:"Volaille",k:105,pr:24,p:1},
-  {n:"Jambon de poulet",c:"Volaille",k:105,pr:18,p:1},{n:"Jambon de dinde",c:"Volaille",k:100,pr:18,p:1},
-  {n:"Pintade",c:"Volaille",k:110,pr:22,p:1},{n:"Caille",c:"Volaille",k:115,pr:22,p:1},
-  {n:"Pigeon",c:"Volaille",k:140,pr:22,p:1},{n:"Autruche",c:"Volaille",k:115,pr:22,p:1},
-  {n:"Blanc de poulet fumé",c:"Volaille",k:110,pr:22,p:1},
+  {n:"Poulet (sans peau)",c:"Volaille",k:120,pr:23,gl:0,li:3,p:1},{n:"Escalope de dinde",c:"Volaille",k:105,pr:24,gl:0,li:1.5,p:1},
+  {n:"Jambon de poulet",c:"Volaille",k:105,pr:18,gl:1,li:2,p:1},{n:"Jambon de dinde",c:"Volaille",k:100,pr:18,gl:1,li:1.5,p:1},
+  {n:"Pintade",c:"Volaille",k:110,pr:22,gl:0,li:3,p:1},{n:"Caille",c:"Volaille",k:115,pr:22,gl:0,li:4,p:1},
+  {n:"Pigeon",c:"Volaille",k:140,pr:22,gl:0,li:8,p:1},{n:"Autruche",c:"Volaille",k:115,pr:22,gl:0,li:2,p:1},
+  {n:"Blanc de poulet fumé",c:"Volaille",k:110,pr:22,gl:1,li:2,p:1},
   // Poissons
-  {n:"Cabillaud",c:"Poisson",k:80,pr:18,p:1},{n:"Colin / lieu",c:"Poisson",k:85,pr:17,p:1},
-  {n:"Sole",c:"Poisson",k:85,pr:17,p:1},{n:"Merlan",c:"Poisson",k:90,pr:18,p:1},
-  {n:"Limande",c:"Poisson",k:85,pr:17,p:1},{n:"Dorade",c:"Poisson",k:95,pr:20,p:1},
-  {n:"Bar (loup de mer)",c:"Poisson",k:95,pr:19,p:1},{n:"Truite",c:"Poisson",k:120,pr:20,p:1},
-  {n:"Thon frais",c:"Poisson",k:140,pr:24,p:1},{n:"Thon au naturel (boîte)",c:"Poisson",k:110,pr:25,p:1},
-  {n:"Saumon",c:"Poisson",k:185,pr:20,p:1},{n:"Saumon fumé",c:"Poisson",k:180,pr:22,p:1},
-  {n:"Sardine",c:"Poisson",k:165,pr:21,p:1},{n:"Maquereau",c:"Poisson",k:190,pr:19,p:1},
-  {n:"Raie",c:"Poisson",k:90,pr:18,p:1},{n:"Rouget",c:"Poisson",k:110,pr:19,p:1},
-  {n:"Turbot",c:"Poisson",k:95,pr:17,p:1},{n:"Espadon",c:"Poisson",k:120,pr:20,p:1},
-  {n:"Flétan",c:"Poisson",k:110,pr:19,p:1},{n:"Cabillaud (œufs de)",c:"Poisson",k:115,pr:20,p:1},
-  {n:"Surimi",c:"Poisson",k:95,pr:10,p:1},
-  {n:"Lotte (baudroie)",c:"Poisson",k:85,pr:18,p:1},{n:"Merlu",c:"Poisson",k:85,pr:17,p:1},
-  {n:"Anchois nature",c:"Poisson",k:135,pr:20,p:1},{n:"Hareng",c:"Poisson",k:190,pr:18,p:1},
-  {n:"Églefin (haddock)",c:"Poisson",k:90,pr:19,p:1},
+  {n:"Cabillaud",c:"Poisson",k:80,pr:18,gl:0,li:1,p:1},{n:"Colin / lieu",c:"Poisson",k:85,pr:17,gl:0,li:1,p:1},
+  {n:"Sole",c:"Poisson",k:85,pr:17,gl:0,li:1.5,p:1},{n:"Merlan",c:"Poisson",k:90,pr:18,gl:0,li:1,p:1},
+  {n:"Limande",c:"Poisson",k:85,pr:17,gl:0,li:1.5,p:1},{n:"Dorade",c:"Poisson",k:95,pr:20,gl:0,li:3,p:1},
+  {n:"Bar (loup de mer)",c:"Poisson",k:95,pr:19,gl:0,li:3,p:1},{n:"Truite",c:"Poisson",k:120,pr:20,gl:0,li:4,p:1},
+  {n:"Thon frais",c:"Poisson",k:140,pr:24,gl:0,li:5,p:1},{n:"Thon au naturel (boîte)",c:"Poisson",k:110,pr:25,gl:0,li:1,p:1},
+  {n:"Saumon",c:"Poisson",k:185,pr:20,gl:0,li:12,p:1},{n:"Saumon fumé",c:"Poisson",k:180,pr:22,gl:0,li:10,p:1},
+  {n:"Sardine",c:"Poisson",k:165,pr:21,gl:0,li:10,p:1},{n:"Maquereau",c:"Poisson",k:190,pr:19,gl:0,li:12,p:1},
+  {n:"Raie",c:"Poisson",k:90,pr:18,gl:0,li:1,p:1},{n:"Rouget",c:"Poisson",k:110,pr:19,gl:0,li:4,p:1},
+  {n:"Turbot",c:"Poisson",k:95,pr:17,gl:0,li:3,p:1},{n:"Espadon",c:"Poisson",k:120,pr:20,gl:0,li:4,p:1},
+  {n:"Flétan",c:"Poisson",k:110,pr:19,gl:0,li:3,p:1},{n:"Cabillaud (œufs de)",c:"Poisson",k:115,pr:20,gl:1,li:3,p:1},
+  {n:"Surimi",c:"Poisson",k:95,pr:10,gl:9,li:1,p:1},
+  {n:"Lotte (baudroie)",c:"Poisson",k:85,pr:18,gl:0,li:1,p:1},{n:"Merlu",c:"Poisson",k:85,pr:17,gl:0,li:1,p:1},
+  {n:"Anchois nature",c:"Poisson",k:135,pr:20,gl:0,li:8,p:1},{n:"Hareng",c:"Poisson",k:190,pr:18,gl:0,li:15,p:1},
+  {n:"Églefin (haddock)",c:"Poisson",k:90,pr:19,gl:0,li:1,p:1},
   // Fruits de mer
-  {n:"Crevettes",c:"Fruits de mer",k:90,pr:20,p:1},{n:"Gambas",c:"Fruits de mer",k:95,pr:20,p:1},
-  {n:"Moules",c:"Fruits de mer",k:75,pr:12,p:1},{n:"Huîtres",c:"Fruits de mer",k:70,pr:9,p:1},
-  {n:"Crabe / tourteau",c:"Fruits de mer",k:85,pr:18,p:1},{n:"Homard",c:"Fruits de mer",k:90,pr:19,p:1},
-  {n:"Langouste",c:"Fruits de mer",k:90,pr:19,p:1},{n:"Langoustines",c:"Fruits de mer",k:90,pr:17,p:1},
-  {n:"Coquilles Saint-Jacques",c:"Fruits de mer",k:90,pr:17,p:1},{n:"Calamars",c:"Fruits de mer",k:80,pr:15,p:1},
-  {n:"Poulpe",c:"Fruits de mer",k:80,pr:15,p:1},{n:"Seiche",c:"Fruits de mer",k:80,pr:16,p:1},
-  {n:"Bulots",c:"Fruits de mer",k:90,pr:17,p:1},{n:"Palourdes",c:"Fruits de mer",k:75,pr:13,p:1},
-  {n:"Praires",c:"Fruits de mer",k:75,pr:13,p:1},{n:"Ormeaux",c:"Fruits de mer",k:85,pr:17,p:1},
+  {n:"Crevettes",c:"Fruits de mer",k:90,pr:20,gl:1,li:1,p:1},{n:"Gambas",c:"Fruits de mer",k:95,pr:20,gl:1,li:1,p:1},
+  {n:"Moules",c:"Fruits de mer",k:75,pr:12,gl:3,li:2,p:1},{n:"Huîtres",c:"Fruits de mer",k:70,pr:9,gl:4,li:2,p:1},
+  {n:"Crabe / tourteau",c:"Fruits de mer",k:85,pr:18,gl:1,li:1,p:1},{n:"Homard",c:"Fruits de mer",k:90,pr:19,gl:1,li:1,p:1},
+  {n:"Langouste",c:"Fruits de mer",k:90,pr:19,gl:1,li:1.5,p:1},{n:"Langoustines",c:"Fruits de mer",k:90,pr:17,gl:1,li:1,p:1},
+  {n:"Coquilles Saint-Jacques",c:"Fruits de mer",k:90,pr:17,gl:3,li:0.5,p:1},{n:"Calamars",c:"Fruits de mer",k:80,pr:15,gl:3,li:1.5,p:1},
+  {n:"Poulpe",c:"Fruits de mer",k:80,pr:15,gl:2,li:1,p:1},{n:"Seiche",c:"Fruits de mer",k:80,pr:16,gl:1,li:1,p:1},
+  {n:"Bulots",c:"Fruits de mer",k:90,pr:17,gl:2,li:1,p:1},{n:"Palourdes",c:"Fruits de mer",k:75,pr:13,gl:3,li:1,p:1},
+  {n:"Praires",c:"Fruits de mer",k:75,pr:13,gl:3,li:1,p:1},{n:"Ormeaux",c:"Fruits de mer",k:85,pr:17,gl:3,li:1,p:1},
   // Œufs
-  {n:"Œufs de poule",c:"Œufs",k:145,pr:13,p:1},{n:"Œufs de caille",c:"Œufs",k:155,pr:13,p:1},
-  {n:"Blanc d'œuf",c:"Œufs",k:50,pr:11,p:1},
+  {n:"Œufs de poule",c:"Œufs",k:145,pr:13,gl:1,li:10,p:1},{n:"Œufs de caille",c:"Œufs",k:155,pr:13,gl:0.6,li:11,p:1},
+  {n:"Blanc d'œuf",c:"Œufs",k:50,pr:11,gl:0.7,li:0,p:1},
   // Laitages 0%
-  {n:"Fromage blanc 0%",c:"Laitage 0%",k:45,pr:8,p:1},{n:"Yaourt nature 0%",c:"Laitage 0%",k:40,pr:5,p:1},
-  {n:"Petits-suisses 0%",c:"Laitage 0%",k:50,pr:8,p:1},{n:"Faisselle 0%",c:"Laitage 0%",k:45,pr:8,p:1},
-  {n:"Lait écrémé",c:"Laitage 0%",k:35,pr:3.4,p:1},{n:"Yaourt aromatisé 0% (sans sucre)",c:"Laitage 0%",k:45,pr:4.5,p:1},
-  {n:"Skyr nature 0%",c:"Laitage 0%",k:65,pr:10,p:1},{n:"Yaourt à la grecque 0%",c:"Laitage 0%",k:55,pr:7,p:1},
+  {n:"Fromage blanc 0%",c:"Laitage 0%",k:45,pr:8,gl:4,li:0.2,p:1},{n:"Yaourt nature 0%",c:"Laitage 0%",k:40,pr:5,gl:5,li:0.2,p:1},
+  {n:"Petits-suisses 0%",c:"Laitage 0%",k:50,pr:8,gl:4,li:0.3,p:1},{n:"Faisselle 0%",c:"Laitage 0%",k:45,pr:8,gl:3,li:0.3,p:1},
+  {n:"Lait écrémé",c:"Laitage 0%",k:35,pr:3.4,gl:5,li:0.2,p:1},{n:"Yaourt aromatisé 0% (sans sucre)",c:"Laitage 0%",k:45,pr:4.5,gl:6,li:0.2,p:1},
+  {n:"Skyr nature 0%",c:"Laitage 0%",k:65,pr:10,gl:4,li:0.2,p:1},{n:"Yaourt à la grecque 0%",c:"Laitage 0%",k:55,pr:7,gl:4,li:0.3,p:1},
   // Protéines végétales
-  {n:"Tofu",c:"Protéine végétale",k:120,pr:12,p:1},{n:"Seitan",c:"Protéine végétale",k:140,pr:25,p:1},
-  {n:"Steak de soja",c:"Protéine végétale",k:130,pr:18,p:1},{n:"Tempeh",c:"Protéine végétale",k:190,pr:19,p:1},
-  {n:"Konjac",c:"Protéine végétale",k:10,pr:0,p:1},
+  {n:"Tofu",c:"Protéine végétale",k:120,pr:12,gl:2,li:7,p:1},{n:"Seitan",c:"Protéine végétale",k:140,pr:25,gl:4,li:2,p:1},
+  {n:"Steak de soja",c:"Protéine végétale",k:130,pr:18,gl:3,li:5,p:1},{n:"Tempeh",c:"Protéine végétale",k:190,pr:19,gl:8,li:9,p:1},
+  {n:"Konjac",c:"Protéine végétale",k:10,pr:0,gl:3,li:0,p:1},
   // Les 28 légumes (dès Croisière, jours PL)
-  {n:"Artichaut",c:"Légume",k:45,pr:2.5,p:2},{n:"Asperge",c:"Légume",k:25,pr:2.2,p:2},
-  {n:"Aubergine",c:"Légume",k:25,pr:1,p:2},{n:"Betterave",c:"Légume",k:45,pr:1.6,p:2},
-  {n:"Blette",c:"Légume",k:20,pr:1.8,p:2},{n:"Brocoli",c:"Légume",k:35,pr:3,p:2},
-  {n:"Carotte",c:"Légume",k:40,pr:0.9,p:2},{n:"Céleri",c:"Légume",k:20,pr:0.7,p:2},
-  {n:"Champignons",c:"Légume",k:25,pr:3,p:2},{n:"Chou (tous types)",c:"Légume",k:30,pr:1.3,p:2},
-  {n:"Chou-fleur",c:"Légume",k:25,pr:2,p:2},{n:"Choux de Bruxelles",c:"Légume",k:40,pr:3.4,p:2},
-  {n:"Concombre",c:"Légume",k:12,pr:0.7,p:2},{n:"Courgette",c:"Légume",k:17,pr:1.2,p:2},
-  {n:"Endive",c:"Légume",k:17,pr:1,p:2},{n:"Épinards",c:"Légume",k:23,pr:2.9,p:2},
-  {n:"Fenouil",c:"Légume",k:20,pr:1.2,p:2},{n:"Haricots verts",c:"Légume",k:30,pr:1.8,p:2},
-  {n:"Salade (laitue, mâche…)",c:"Légume",k:15,pr:1.3,p:2},{n:"Navet",c:"Légume",k:28,pr:0.9,p:2},
-  {n:"Oignon",c:"Légume",k:40,pr:1.1,p:2},{n:"Cœurs de palmier",c:"Légume",k:25,pr:1.5,p:2},
-  {n:"Poireau",c:"Légume",k:30,pr:1.5,p:2},{n:"Poivron",c:"Légume",k:25,pr:1,p:2},
-  {n:"Potiron / citrouille",c:"Légume",k:20,pr:1,p:2},{n:"Radis",c:"Légume",k:15,pr:0.7,p:2},
-  {n:"Pousses de soja",c:"Légume",k:50,pr:3.6,p:2},{n:"Tomate",c:"Légume",k:18,pr:0.9,p:2},
-  {n:"Ail",c:"Légume",k:150,pr:6,p:2},{n:"Persil / herbes fraîches",c:"Légume",k:35,pr:3,p:2},
-  {n:"Cornichons",c:"Légume",k:11,pr:0.9,p:2},{n:"Gingembre frais",c:"Légume",k:80,pr:1.8,p:2},
+  {n:"Artichaut",c:"Légume",k:45,pr:2.5,gl:10,li:0.2,p:2},{n:"Asperge",c:"Légume",k:25,pr:2.2,gl:3,li:0.2,p:2},
+  {n:"Aubergine",c:"Légume",k:25,pr:1,gl:6,li:0.2,p:2},{n:"Betterave",c:"Légume",k:45,pr:1.6,gl:8,li:0.2,p:2},
+  {n:"Blette",c:"Légume",k:20,pr:1.8,gl:3,li:0.2,p:2},{n:"Brocoli",c:"Légume",k:35,pr:3,gl:4,li:0.4,p:2},
+  {n:"Carotte",c:"Légume",k:40,pr:0.9,gl:7,li:0.2,p:2},{n:"Céleri",c:"Légume",k:20,pr:0.7,gl:3,li:0.2,p:2},
+  {n:"Champignons",c:"Légume",k:25,pr:3,gl:3,li:0.3,p:2},{n:"Chou (tous types)",c:"Légume",k:30,pr:1.3,gl:5,li:0.2,p:2},
+  {n:"Chou-fleur",c:"Légume",k:25,pr:2,gl:3,li:0.3,p:2},{n:"Choux de Bruxelles",c:"Légume",k:40,pr:3.4,gl:6,li:0.3,p:2},
+  {n:"Concombre",c:"Légume",k:12,pr:0.7,gl:2,li:0.2,p:2},{n:"Courgette",c:"Légume",k:17,pr:1.2,gl:3,li:0.3,p:2},
+  {n:"Endive",c:"Légume",k:17,pr:1,gl:2,li:0.1,p:2},{n:"Épinards",c:"Légume",k:23,pr:2.9,gl:2,li:0.4,p:2},
+  {n:"Fenouil",c:"Légume",k:20,pr:1.2,gl:3,li:0.2,p:2},{n:"Haricots verts",c:"Légume",k:30,pr:1.8,gl:5,li:0.2,p:2},
+  {n:"Salade (laitue, mâche…)",c:"Légume",k:15,pr:1.3,gl:2,li:0.2,p:2},{n:"Navet",c:"Légume",k:28,pr:0.9,gl:4,li:0.1,p:2},
+  {n:"Oignon",c:"Légume",k:40,pr:1.1,gl:8,li:0.1,p:2},{n:"Cœurs de palmier",c:"Légume",k:25,pr:1.5,gl:3,li:0.5,p:2},
+  {n:"Poireau",c:"Légume",k:30,pr:1.5,gl:5,li:0.3,p:2},{n:"Poivron",c:"Légume",k:25,pr:1,gl:4,li:0.3,p:2},
+  {n:"Potiron / citrouille",c:"Légume",k:20,pr:1,gl:4,li:0.1,p:2},{n:"Radis",c:"Légume",k:15,pr:0.7,gl:2,li:0.1,p:2},
+  {n:"Pousses de soja",c:"Légume",k:50,pr:3.6,gl:4,li:0.2,p:2},{n:"Tomate",c:"Légume",k:18,pr:0.9,gl:3,li:0.2,p:2},
+  {n:"Ail",c:"Légume",k:150,pr:6,gl:28,li:0.2,p:2},{n:"Persil / herbes fraîches",c:"Légume",k:35,pr:3,gl:4,li:0.6,p:2},
+  {n:"Cornichons",c:"Légume",k:11,pr:0.9,gl:1.5,li:0.2,p:2},{n:"Gingembre frais",c:"Légume",k:80,pr:1.8,gl:16,li:0.7,p:2},
   // Indispensables & tolérés
-  {n:"Son d'avoine",c:"Indispensable",k:350,pr:15,p:1},{n:"Son de blé",c:"Indispensable",k:260,pr:16,p:1},
-  {n:"Café / thé (sans sucre)",c:"Boisson",k:0,pr:0,p:1},{n:"Eau / eau gazeuse",c:"Boisson",k:0,pr:0,p:1},
-  {n:"Fromage blanc 3% (toléré)",c:"Toléré",k:60,pr:7,p:3},{n:"Lait de soja nature (toléré)",c:"Toléré",k:45,pr:3,p:3},
-  {n:"Maïzena (toléré, 1 c.à.s.)",c:"Toléré",k:380,pr:0.3,p:3},{n:"Cacao dégraissé 1% (toléré, 1 c.à.c.)",c:"Toléré",k:250,pr:20,p:3},
-  {n:"Crème fraîche 4% (toléré, 1 c.à.s.)",c:"Toléré",k:80,pr:3,p:3},{n:"Vin blanc de cuisson (toléré, 3 c.à.s.)",c:"Toléré",k:80,pr:0.1,p:3},
-  {n:"Saucisse de volaille <10% MG (toléré)",c:"Toléré",k:170,pr:15,p:3},{n:"Baies de goji (toléré, 1 c.à.s.)",c:"Toléré",k:310,pr:14,p:3},
+  {n:"Son d'avoine",c:"Indispensable",k:350,pr:15,gl:40,li:9,p:1},{n:"Son de blé",c:"Indispensable",k:260,pr:16,gl:24,li:3,p:1},
+  {n:"Café / thé (sans sucre)",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1},{n:"Eau / eau gazeuse",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1},
+  {n:"Fromage blanc 3% (toléré)",c:"Toléré",k:60,pr:7,gl:4,li:3,p:3},{n:"Lait de soja nature (toléré)",c:"Toléré",k:45,pr:3,gl:2,li:2,p:3},
+  {n:"Maïzena (toléré, 1 c.à.s.)",c:"Toléré",k:380,pr:0.3,gl:88,li:0.5,p:3},{n:"Cacao dégraissé 1% (toléré, 1 c.à.c.)",c:"Toléré",k:250,pr:20,gl:11,li:1,p:3},
+  {n:"Crème fraîche 4% (toléré, 1 c.à.s.)",c:"Toléré",k:80,pr:3,gl:3,li:4,p:3},{n:"Vin blanc de cuisson (toléré, 3 c.à.s.)",c:"Toléré",k:80,pr:0.1,gl:0.5,li:0,p:3},
+  {n:"Saucisse de volaille <10% MG (toléré)",c:"Toléré",k:170,pr:15,gl:2,li:9,p:3},{n:"Baies de goji (toléré, 1 c.à.s.)",c:"Toléré",k:310,pr:14,gl:60,li:1,p:3},
   // Réintroductions (Consolidation / Stabilisation, en quantités précises)
-  {n:"Pomme (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:52,pr:0.3,p:4},
-  {n:"Poire (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:57,pr:0.4,p:4},
-  {n:"Fraises (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:32,pr:0.7,p:4},
-  {n:"Pêche (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:39,pr:0.9,p:4},
-  {n:"Melon (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:34,pr:0.8,p:4},
-  {n:"Kiwi (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:61,pr:1.1,p:4},
-  {n:"Pain complet (2 tranches, Consolidation)",c:"Féculent (réintroduction)",k:250,pr:9,p:4},
-  {n:"Fromage à pâte dure (40 g, Consolidation)",c:"Fromage (réintroduction)",k:380,pr:26,p:4},
-  {n:"Riz complet (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:130,pr:2.7,p:4},
-  {n:"Pâtes complètes (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:124,pr:5,p:4},
-  {n:"Pommes de terre (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:77,pr:2,p:4},
-  {n:"Lentilles cuites (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:116,pr:9,p:4},
+  {n:"Pomme (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:52,pr:0.3,gl:14,li:0.2,p:4},
+  {n:"Poire (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:57,pr:0.4,gl:14,li:0.2,p:4},
+  {n:"Fraises (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:32,pr:0.7,gl:7,li:0.3,p:4},
+  {n:"Pêche (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:39,pr:0.9,gl:9,li:0.1,p:4},
+  {n:"Melon (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:34,pr:0.8,gl:8,li:0.2,p:4},
+  {n:"Kiwi (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:61,pr:1.1,gl:14,li:0.5,p:4},
+  {n:"Pain complet (2 tranches, Consolidation)",c:"Féculent (réintroduction)",k:250,pr:9,gl:45,li:3,p:4},
+  {n:"Fromage à pâte dure (40 g, Consolidation)",c:"Fromage (réintroduction)",k:380,pr:26,gl:1,li:30,p:4},
+  {n:"Riz complet (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:130,pr:2.7,gl:27,li:1,p:4},
+  {n:"Pâtes complètes (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:124,pr:5,gl:25,li:1,p:4},
+  {n:"Pommes de terre (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:77,pr:2,gl:17,li:0.1,p:4},
+  {n:"Lentilles cuites (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:116,pr:9,gl:18,li:0.5,p:4},
 
   // ═══ Ajouts : Viande (gibier & pièces maigres supplémentaires) ═══
-  {n:"Viande de bison",c:"Viande",k:120,pr:22,p:1},{n:"Viande de kangourou",c:"Viande",k:110,pr:22,p:1},
-  {n:"Chevreuil (gibier)",c:"Viande",k:120,pr:22,p:1},{n:"Sanglier maigre (gibier)",c:"Viande",k:140,pr:21,p:1},
-  {n:"Cœur de bœuf",c:"Viande",k:110,pr:17,p:1},{n:"Jarret de veau",c:"Viande",k:110,pr:20,p:1},
-  {n:"Paleron de bœuf maigre",c:"Viande",k:145,pr:20,p:1},{n:"Aiguillette de bœuf",c:"Viande",k:125,pr:21,p:1},
+  {n:"Viande de bison",c:"Viande",k:120,pr:22,gl:0,li:3,p:1},{n:"Viande de kangourou",c:"Viande",k:110,pr:22,gl:0,li:1,p:1},
+  {n:"Chevreuil (gibier)",c:"Viande",k:120,pr:22,gl:0,li:2,p:1},{n:"Sanglier maigre (gibier)",c:"Viande",k:140,pr:21,gl:0,li:6,p:1},
+  {n:"Cœur de bœuf",c:"Viande",k:110,pr:17,gl:0.5,li:4,p:1},{n:"Jarret de veau",c:"Viande",k:110,pr:20,gl:0,li:3,p:1},
+  {n:"Paleron de bœuf maigre",c:"Viande",k:145,pr:20,gl:0,li:7,p:1},{n:"Aiguillette de bœuf",c:"Viande",k:125,pr:21,gl:0,li:4,p:1},
 
   // ═══ Ajouts : Volailles ═══
-  {n:"Poulet fermier (sans peau)",c:"Volaille",k:120,pr:23,p:1},{n:"Cuisse de poulet (sans peau)",c:"Volaille",k:130,pr:21,p:1},
-  {n:"Chapon (sans peau)",c:"Volaille",k:130,pr:22,p:1},{n:"Faisan",c:"Volaille",k:130,pr:23,p:1},
-  {n:"Perdrix",c:"Volaille",k:120,pr:23,p:1},{n:"Cuisse de dinde (sans peau)",c:"Volaille",k:120,pr:21,p:1},
+  {n:"Poulet fermier (sans peau)",c:"Volaille",k:120,pr:23,gl:0,li:4,p:1},{n:"Cuisse de poulet (sans peau)",c:"Volaille",k:130,pr:21,gl:0,li:8,p:1},
+  {n:"Chapon (sans peau)",c:"Volaille",k:130,pr:22,gl:0,li:5,p:1},{n:"Faisan",c:"Volaille",k:130,pr:23,gl:0,li:4,p:1},
+  {n:"Perdrix",c:"Volaille",k:120,pr:23,gl:0,li:3,p:1},{n:"Cuisse de dinde (sans peau)",c:"Volaille",k:120,pr:21,gl:0,li:5,p:1},
 
   // ═══ Ajouts : Poissons ═══
-  {n:"Bar d'élevage",c:"Poisson",k:100,pr:18,p:1},{n:"Carpe",c:"Poisson",k:110,pr:18,p:1},
-  {n:"Brochet",c:"Poisson",k:90,pr:19,p:1},{n:"Perche",c:"Poisson",k:90,pr:19,p:1},
-  {n:"Sandre",c:"Poisson",k:90,pr:19,p:1},{n:"Tilapia",c:"Poisson",k:95,pr:20,p:1},
-  {n:"Panga",c:"Poisson",k:90,pr:15,p:1},{n:"Roussette (saumonette)",c:"Poisson",k:90,pr:17,p:1},
-  {n:"Grenadier",c:"Poisson",k:85,pr:17,p:1},{n:"Lingue (julienne)",c:"Poisson",k:85,pr:18,p:1},
-  {n:"Rascasse",c:"Poisson",k:90,pr:18,p:1},{n:"Congre",c:"Poisson",k:100,pr:18,p:1},
-  {n:"Vivaneau",c:"Poisson",k:100,pr:20,p:1},{n:"Mulet",c:"Poisson",k:120,pr:19,p:1},
-  {n:"Poisson-chat",c:"Poisson",k:105,pr:16,p:1},{n:"Truite saumonée",c:"Poisson",k:140,pr:20,p:1},
+  {n:"Bar d'élevage",c:"Poisson",k:100,pr:18,gl:0,li:5,p:1},{n:"Carpe",c:"Poisson",k:110,pr:18,gl:0,li:5,p:1},
+  {n:"Brochet",c:"Poisson",k:90,pr:19,gl:0,li:1,p:1},{n:"Perche",c:"Poisson",k:90,pr:19,gl:0,li:1,p:1},
+  {n:"Sandre",c:"Poisson",k:90,pr:19,gl:0,li:1,p:1},{n:"Tilapia",c:"Poisson",k:95,pr:20,gl:0,li:2,p:1},
+  {n:"Panga",c:"Poisson",k:90,pr:15,gl:0,li:2,p:1},{n:"Roussette (saumonette)",c:"Poisson",k:90,pr:17,gl:0,li:2,p:1},
+  {n:"Grenadier",c:"Poisson",k:85,pr:17,gl:0,li:1,p:1},{n:"Lingue (julienne)",c:"Poisson",k:85,pr:18,gl:0,li:1,p:1},
+  {n:"Rascasse",c:"Poisson",k:90,pr:18,gl:0,li:2,p:1},{n:"Congre",c:"Poisson",k:100,pr:18,gl:0,li:3,p:1},
+  {n:"Vivaneau",c:"Poisson",k:100,pr:20,gl:0,li:2,p:1},{n:"Mulet",c:"Poisson",k:120,pr:19,gl:0,li:5,p:1},
+  {n:"Poisson-chat",c:"Poisson",k:105,pr:16,gl:0,li:4,p:1},{n:"Truite saumonée",c:"Poisson",k:140,pr:20,gl:0,li:9,p:1},
 
   // ═══ Ajouts : Fruits de mer ═══
-  {n:"Pétoncles",c:"Fruits de mer",k:85,pr:17,p:1},{n:"Couteaux (fruits de mer)",c:"Fruits de mer",k:80,pr:14,p:1},
-  {n:"Oursin",c:"Fruits de mer",k:100,pr:15,p:1},{n:"Escargots (sans beurre)",c:"Fruits de mer",k:90,pr:16,p:1},
-  {n:"Encornets",c:"Fruits de mer",k:80,pr:15,p:1},
+  {n:"Pétoncles",c:"Fruits de mer",k:85,pr:17,gl:3,li:0.5,p:1},{n:"Couteaux (fruits de mer)",c:"Fruits de mer",k:80,pr:14,gl:2,li:1,p:1},
+  {n:"Oursin",c:"Fruits de mer",k:100,pr:15,gl:3,li:4,p:1},{n:"Escargots (sans beurre)",c:"Fruits de mer",k:90,pr:16,gl:2,li:1,p:1},
+  {n:"Encornets",c:"Fruits de mer",k:80,pr:15,gl:3,li:1.5,p:1},
 
   // ═══ Ajouts : Œufs ═══
-  {n:"Œuf dur",c:"Œufs",k:140,pr:13,p:1},{n:"Œuf mollet",c:"Œufs",k:140,pr:13,p:1},
-  {n:"Œuf poché",c:"Œufs",k:140,pr:13,p:1},{n:"Omelette nature (sans matière grasse)",c:"Œufs",k:145,pr:12,p:1},
+  {n:"Œuf dur",c:"Œufs",k:140,pr:13,gl:1,li:10,p:1},{n:"Œuf mollet",c:"Œufs",k:140,pr:13,gl:1,li:10,p:1},
+  {n:"Œuf poché",c:"Œufs",k:140,pr:13,gl:1,li:10,p:1},{n:"Omelette nature (sans matière grasse)",c:"Œufs",k:145,pr:12,gl:1,li:10,p:1},
 
   // ═══ Ajouts : Laitages 0% ═══
-  {n:"Cottage cheese 0%",c:"Laitage 0%",k:70,pr:11,p:1},{n:"Kéfir de lait 0%",c:"Laitage 0%",k:40,pr:3.5,p:1},
-  {n:"Babeurre 0%",c:"Laitage 0%",k:35,pr:3.3,p:1},{n:"Yaourt à boire 0%",c:"Laitage 0%",k:45,pr:3.5,p:1},
-  {n:"Fromage frais ail et fines herbes 0%",c:"Laitage 0%",k:55,pr:8,p:1},
+  {n:"Cottage cheese 0%",c:"Laitage 0%",k:70,pr:11,gl:3,li:1,p:1},{n:"Kéfir de lait 0%",c:"Laitage 0%",k:40,pr:3.5,gl:4,li:0.3,p:1},
+  {n:"Babeurre 0%",c:"Laitage 0%",k:35,pr:3.3,gl:4,li:0.5,p:1},{n:"Yaourt à boire 0%",c:"Laitage 0%",k:45,pr:3.5,gl:5,li:0.3,p:1},
+  {n:"Fromage frais ail et fines herbes 0%",c:"Laitage 0%",k:55,pr:8,gl:3,li:0.5,p:1},
 
   // ═══ Ajouts : Protéines végétales ═══
-  {n:"Edamame",c:"Protéine végétale",k:120,pr:11,p:1},{n:"Protéines de pois texturées",c:"Protéine végétale",k:330,pr:52,p:1},
-  {n:"Steak végétal maigre (simili-carné)",c:"Protéine végétale",k:130,pr:18,p:1},
+  {n:"Edamame",c:"Protéine végétale",k:120,pr:11,gl:8,li:5,p:1},{n:"Protéines de pois texturées",c:"Protéine végétale",k:330,pr:52,gl:30,li:2,p:1},
+  {n:"Steak végétal maigre (simili-carné)",c:"Protéine végétale",k:130,pr:18,gl:6,li:4,p:1},
 
   // ═══ Ajouts : Légumes (dès la Croisière, jours PL) ═══
-  {n:"Épinards surgelés",c:"Légume",k:23,pr:2.9,p:2},{n:"Haricots beurre",c:"Légume",k:30,pr:1.8,p:2},
-  {n:"Salsifis",c:"Légume",k:60,pr:2.5,p:2},{n:"Rutabaga",c:"Légume",k:35,pr:1.1,p:2},
-  {n:"Panais",c:"Légume",k:65,pr:1.5,p:2},{n:"Chou romanesco",c:"Légume",k:30,pr:2.8,p:2},
-  {n:"Chou kale",c:"Légume",k:35,pr:3,p:2},{n:"Chou chinois (pak-choï)",c:"Légume",k:15,pr:1.5,p:2},
-  {n:"Pousses de bambou",c:"Légume",k:20,pr:2,p:2},{n:"Algues nori (déshydratées)",c:"Légume",k:35,pr:6,p:2},
-  {n:"Algue wakamé",c:"Légume",k:45,pr:3,p:2},{n:"Cresson",c:"Légume",k:12,pr:2.3,p:2},
-  {n:"Roquette",c:"Légume",k:18,pr:2.6,p:2},{n:"Mâche",c:"Légume",k:14,pr:2,p:2},
-  {n:"Pourpier",c:"Légume",k:16,pr:1.3,p:2},{n:"Bettes à cardes",c:"Légume",k:20,pr:1.8,p:2},
-  {n:"Courge spaghetti",c:"Légume",k:22,pr:0.6,p:2},{n:"Chayote",c:"Légume",k:19,pr:0.8,p:2},
-  {n:"Céleri-rave",c:"Légume",k:35,pr:1.5,p:2},{n:"Tomates cerises",c:"Légume",k:18,pr:0.9,p:2},
-  {n:"Tomates séchées (sans huile)",c:"Légume",k:80,pr:4,p:2},{n:"Champignons de Paris",c:"Légume",k:22,pr:3,p:2},
-  {n:"Pleurotes",c:"Légume",k:33,pr:3,p:2},{n:"Shiitake",c:"Légume",k:34,pr:2.2,p:2},
-  {n:"Girolles",c:"Légume",k:25,pr:2.5,p:2},{n:"Cèpes",c:"Légume",k:25,pr:3,p:2},
-  {n:"Poivron rouge",c:"Légume",k:26,pr:1,p:2},{n:"Poivron jaune",c:"Légume",k:27,pr:1,p:2},
+  {n:"Épinards surgelés",c:"Légume",k:23,pr:2.9,gl:2,li:0.4,p:2},{n:"Haricots beurre",c:"Légume",k:30,pr:1.8,gl:5,li:0.2,p:2},
+  {n:"Salsifis",c:"Légume",k:60,pr:2.5,gl:11,li:0.2,p:2},{n:"Rutabaga",c:"Légume",k:35,pr:1.1,gl:6,li:0.1,p:2},
+  {n:"Panais",c:"Légume",k:65,pr:1.5,gl:13,li:0.3,p:2},{n:"Chou romanesco",c:"Légume",k:30,pr:2.8,gl:4,li:0.3,p:2},
+  {n:"Chou kale",c:"Légume",k:35,pr:3,gl:5,li:0.6,p:2},{n:"Chou chinois (pak-choï)",c:"Légume",k:15,pr:1.5,gl:2,li:0.2,p:2},
+  {n:"Pousses de bambou",c:"Légume",k:20,pr:2,gl:3,li:0.3,p:2},{n:"Algues nori (déshydratées)",c:"Légume",k:35,pr:6,gl:5,li:0.3,p:2},
+  {n:"Algue wakamé",c:"Légume",k:45,pr:3,gl:6,li:0.6,p:2},{n:"Cresson",c:"Légume",k:12,pr:2.3,gl:1,li:0.3,p:2},
+  {n:"Roquette",c:"Légume",k:18,pr:2.6,gl:2,li:0.7,p:2},{n:"Mâche",c:"Légume",k:14,pr:2,gl:2,li:0.4,p:2},
+  {n:"Pourpier",c:"Légume",k:16,pr:1.3,gl:2,li:0.4,p:2},{n:"Bettes à cardes",c:"Légume",k:20,pr:1.8,gl:3,li:0.2,p:2},
+  {n:"Courge spaghetti",c:"Légume",k:22,pr:0.6,gl:5,li:0.2,p:2},{n:"Chayote",c:"Légume",k:19,pr:0.8,gl:4,li:0.1,p:2},
+  {n:"Céleri-rave",c:"Légume",k:35,pr:1.5,gl:6,li:0.3,p:2},{n:"Tomates cerises",c:"Légume",k:18,pr:0.9,gl:3,li:0.2,p:2},
+  {n:"Tomates séchées (sans huile)",c:"Légume",k:80,pr:4,gl:16,li:0.5,p:2},{n:"Champignons de Paris",c:"Légume",k:22,pr:3,gl:2,li:0.3,p:2},
+  {n:"Pleurotes",c:"Légume",k:33,pr:3,gl:4,li:0.4,p:2},{n:"Shiitake",c:"Légume",k:34,pr:2.2,gl:6,li:0.5,p:2},
+  {n:"Girolles",c:"Légume",k:25,pr:2.5,gl:4,li:0.5,p:2},{n:"Cèpes",c:"Légume",k:25,pr:3,gl:4,li:0.5,p:2},
+  {n:"Poivron rouge",c:"Légume",k:26,pr:1,gl:5,li:0.3,p:2},{n:"Poivron jaune",c:"Légume",k:27,pr:1,gl:5,li:0.3,p:2},
 
   // ═══ Ajouts : Boissons ═══
-  {n:"Thé vert",c:"Boisson",k:0,pr:0,p:1},{n:"Thé noir",c:"Boisson",k:0,pr:0,p:1},
-  {n:"Tisane / infusion",c:"Boisson",k:0,pr:0,p:1},{n:"Bouillon de légumes (sans matière grasse)",c:"Boisson",k:5,pr:0.3,p:1},
-  {n:"Bouillon de volaille dégraissé",c:"Boisson",k:10,pr:1,p:1},{n:"Eau aromatisée sans sucre",c:"Boisson",k:0,pr:0,p:1},
-  {n:"Café décaféiné",c:"Boisson",k:0,pr:0,p:1},
+  {n:"Thé vert",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1},{n:"Thé noir",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1},
+  {n:"Tisane / infusion",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1},{n:"Bouillon de légumes (sans matière grasse)",c:"Boisson",k:5,pr:0.3,gl:1,li:0,p:1},
+  {n:"Bouillon de volaille dégraissé",c:"Boisson",k:10,pr:1,gl:0.5,li:0.3,p:1},{n:"Eau aromatisée sans sucre",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1},
+  {n:"Café décaféiné",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1},
 
   // ═══ Ajouts : Indispensables ═══
-  {n:"Psyllium (fibres)",c:"Indispensable",k:210,pr:3,p:1},{n:"Agar-agar",c:"Indispensable",k:25,pr:2,p:1},
-  {n:"Gélatine alimentaire",c:"Indispensable",k:335,pr:84,p:1},
+  {n:"Psyllium (fibres)",c:"Indispensable",k:210,pr:3,gl:10,li:1,p:1},{n:"Agar-agar",c:"Indispensable",k:25,pr:2,gl:3,li:0,p:1},
+  {n:"Gélatine alimentaire",c:"Indispensable",k:335,pr:84,gl:0,li:0,p:1},
 
   // ═══ Ajouts : Tolérés (max 2/jour) ═══
-  {n:"Moutarde",c:"Toléré",k:60,pr:4,p:3},{n:"Vinaigre (tous types)",c:"Toléré",k:20,pr:0,p:3},
-  {n:"Câpres",c:"Toléré",k:25,pr:2,p:3},{n:"Sauce soja allégée",c:"Toléré",k:55,pr:6,p:3},
-  {n:"Ketchup light (1 c.à.s.)",c:"Toléré",k:70,pr:1,p:3},{n:"Mayonnaise allégée 5% (1 c.à.s.)",c:"Toléré",k:150,pr:1,p:3},
-  {n:"Compote sans sucre ajouté (toléré)",c:"Toléré",k:50,pr:0.3,p:3},{n:"Gélatine light aromatisée (dessert 0%)",c:"Toléré",k:35,pr:5,p:3},
-  {n:"Chewing-gum sans sucre",c:"Toléré",k:0,pr:0,p:3},{n:"Édulcorant de table",c:"Toléré",k:0,pr:0,p:3},
-  {n:"Vinaigrette allégée maison (1 c.à.s.)",c:"Toléré",k:40,pr:0,p:3},{n:"Sirop 0% calorie (1 c.à.s.)",c:"Toléré",k:5,pr:0,p:3},
-  {n:"Fromage à tartiner 0% (toléré)",c:"Toléré",k:70,pr:9,p:3},{n:"Pickles (légumes au vinaigre)",c:"Toléré",k:15,pr:0.5,p:3},
-  {n:"Algues déshydratées (assaisonnement, toléré)",c:"Toléré",k:35,pr:5,p:3},{n:"Ricotta allégée (toléré)",c:"Toléré",k:120,pr:9,p:3},
-  {n:"Mozzarella allégée (toléré, 30 g)",c:"Toléré",k:170,pr:22,p:3},{n:"Œufs de saumon (toléré)",c:"Toléré",k:250,pr:27,p:3},
-  {n:"Tarama allégé (toléré)",c:"Toléré",k:200,pr:5,p:3},{n:"Levure maltée (toléré)",c:"Toléré",k:340,pr:45,p:3},
+  {n:"Moutarde",c:"Toléré",k:60,pr:4,gl:5,li:3.5,p:3},{n:"Vinaigre (tous types)",c:"Toléré",k:20,pr:0,gl:1,li:0,p:3},
+  {n:"Câpres",c:"Toléré",k:25,pr:2,gl:2,li:0.5,p:3},{n:"Sauce soja allégée",c:"Toléré",k:55,pr:6,gl:8,li:0.2,p:3},
+  {n:"Ketchup light (1 c.à.s.)",c:"Toléré",k:70,pr:1,gl:15,li:0.2,p:3},{n:"Mayonnaise allégée 5% (1 c.à.s.)",c:"Toléré",k:150,pr:1,gl:3,li:5,p:3},
+  {n:"Compote sans sucre ajouté (toléré)",c:"Toléré",k:50,pr:0.3,gl:12,li:0.2,p:3},{n:"Gélatine light aromatisée (dessert 0%)",c:"Toléré",k:35,pr:5,gl:5,li:0.1,p:3},
+  {n:"Chewing-gum sans sucre",c:"Toléré",k:0,pr:0,gl:2,li:0,p:3},{n:"Édulcorant de table",c:"Toléré",k:0,pr:0,gl:2,li:0,p:3},
+  {n:"Vinaigrette allégée maison (1 c.à.s.)",c:"Toléré",k:40,pr:0,gl:2,li:4,p:3},{n:"Sirop 0% calorie (1 c.à.s.)",c:"Toléré",k:5,pr:0,gl:1,li:0,p:3},
+  {n:"Fromage à tartiner 0% (toléré)",c:"Toléré",k:70,pr:9,gl:4,li:1,p:3},{n:"Pickles (légumes au vinaigre)",c:"Toléré",k:15,pr:0.5,gl:2,li:0.1,p:3},
+  {n:"Algues déshydratées (assaisonnement, toléré)",c:"Toléré",k:35,pr:5,gl:5,li:0.3,p:3},{n:"Ricotta allégée (toléré)",c:"Toléré",k:120,pr:9,gl:3,li:7,p:3},
+  {n:"Mozzarella allégée (toléré, 30 g)",c:"Toléré",k:170,pr:22,gl:2,li:9,p:3},{n:"Œufs de saumon (toléré)",c:"Toléré",k:250,pr:27,gl:4,li:18,p:3},
+  {n:"Tarama allégé (toléré)",c:"Toléré",k:200,pr:5,gl:4,li:18,p:3},{n:"Levure maltée (toléré)",c:"Toléré",k:340,pr:45,gl:35,li:5,p:3},
 
   // ═══ Ajouts : Fruits (réintroduction, Consolidation) ═══
-  {n:"Orange (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:47,pr:0.9,p:4},
-  {n:"Clémentine (2 fruits, Consolidation)",c:"Fruit (réintroduction)",k:47,pr:0.8,p:4},
-  {n:"Pamplemousse (1/2, Consolidation)",c:"Fruit (réintroduction)",k:42,pr:0.8,p:4},
-  {n:"Prune (Consolidation)",c:"Fruit (réintroduction)",k:46,pr:0.7,p:4},
-  {n:"Cerises (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:63,pr:1,p:4},
-  {n:"Abricot (Consolidation)",c:"Fruit (réintroduction)",k:48,pr:1.4,p:4},
-  {n:"Ananas (1 tranche, Consolidation)",c:"Fruit (réintroduction)",k:50,pr:0.5,p:4},
-  {n:"Mangue (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:60,pr:0.8,p:4},
-  {n:"Framboises (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:52,pr:1.2,p:4},
-  {n:"Myrtilles (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:57,pr:0.7,p:4},
-  {n:"Mandarine (Consolidation)",c:"Fruit (réintroduction)",k:53,pr:0.8,p:4},
-  {n:"Nectarine (Consolidation)",c:"Fruit (réintroduction)",k:44,pr:1.1,p:4},
+  {n:"Orange (1 fruit, Consolidation)",c:"Fruit (réintroduction)",k:47,pr:0.9,gl:11,li:0.2,p:4},
+  {n:"Clémentine (2 fruits, Consolidation)",c:"Fruit (réintroduction)",k:47,pr:0.8,gl:11,li:0.2,p:4},
+  {n:"Pamplemousse (1/2, Consolidation)",c:"Fruit (réintroduction)",k:42,pr:0.8,gl:10,li:0.1,p:4},
+  {n:"Prune (Consolidation)",c:"Fruit (réintroduction)",k:46,pr:0.7,gl:11,li:0.2,p:4},
+  {n:"Cerises (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:63,pr:1,gl:15,li:0.2,p:4},
+  {n:"Abricot (Consolidation)",c:"Fruit (réintroduction)",k:48,pr:1.4,gl:11,li:0.3,p:4},
+  {n:"Ananas (1 tranche, Consolidation)",c:"Fruit (réintroduction)",k:50,pr:0.5,gl:12,li:0.1,p:4},
+  {n:"Mangue (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:60,pr:0.8,gl:15,li:0.4,p:4},
+  {n:"Framboises (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:52,pr:1.2,gl:6,li:0.5,p:4},
+  {n:"Myrtilles (1 portion, Consolidation)",c:"Fruit (réintroduction)",k:57,pr:0.7,gl:14,li:0.3,p:4},
+  {n:"Mandarine (Consolidation)",c:"Fruit (réintroduction)",k:53,pr:0.8,gl:13,li:0.3,p:4},
+  {n:"Nectarine (Consolidation)",c:"Fruit (réintroduction)",k:44,pr:1.1,gl:10,li:0.3,p:4},
 
   // ═══ Ajouts : Féculents & légumineuses (réintroduction, Stabilisation) ═══
-  {n:"Pain complet aux céréales (2 tranches, Consolidation)",c:"Féculent (réintroduction)",k:260,pr:10,p:4},
-  {n:"Boulgour (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:120,pr:4,p:4},
-  {n:"Quinoa (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:120,pr:4.4,p:4},
-  {n:"Sarrasin / blé noir (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:110,pr:3.7,p:4},
-  {n:"Semoule complète (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:115,pr:3.8,p:4},
-  {n:"Petits pois (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:80,pr:5.4,p:4},
-  {n:"Flageolets (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:100,pr:7,p:4},
-  {n:"Pois chiches cuits (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:120,pr:7,p:4},
-  {n:"Haricots rouges cuits (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:110,pr:7,p:4},
-  {n:"Haricots blancs cuits (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:100,pr:7,p:4},
+  {n:"Pain complet aux céréales (2 tranches, Consolidation)",c:"Féculent (réintroduction)",k:260,pr:10,gl:43,li:4,p:4},
+  {n:"Boulgour (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:120,pr:4,gl:25,li:0.5,p:4},
+  {n:"Quinoa (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:120,pr:4.4,gl:21,li:2,p:4},
+  {n:"Sarrasin / blé noir (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:110,pr:3.7,gl:22,li:1,p:4},
+  {n:"Semoule complète (1 portion, Stabilisation)",c:"Féculent (réintroduction)",k:115,pr:3.8,gl:23,li:0.6,p:4},
+  {n:"Petits pois (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:80,pr:5.4,gl:12,li:0.4,p:4},
+  {n:"Flageolets (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:100,pr:7,gl:16,li:0.5,p:4},
+  {n:"Pois chiches cuits (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:120,pr:7,gl:20,li:2,p:4},
+  {n:"Haricots rouges cuits (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:110,pr:7,gl:18,li:0.5,p:4},
+  {n:"Haricots blancs cuits (1 portion, Stabilisation)",c:"Légumineuse (réintroduction)",k:100,pr:7,gl:17,li:0.4,p:4},
 
   // ═══ Ajouts : Fromages (réintroduction, Consolidation) ═══
-  {n:"Camembert (30 g, Consolidation)",c:"Fromage (réintroduction)",k:300,pr:20,p:4},
-  {n:"Chèvre frais (30 g, Consolidation)",c:"Fromage (réintroduction)",k:260,pr:18,p:4},
-  {n:"Comté (30 g, Consolidation)",c:"Fromage (réintroduction)",k:410,pr:28,p:4},
-  {n:"Mozzarella (30 g, Consolidation)",c:"Fromage (réintroduction)",k:280,pr:22,p:4},
+  {n:"Camembert (30 g, Consolidation)",c:"Fromage (réintroduction)",k:300,pr:20,gl:0.5,li:23,p:4},
+  {n:"Chèvre frais (30 g, Consolidation)",c:"Fromage (réintroduction)",k:260,pr:18,gl:3,li:20,p:4},
+  {n:"Comté (30 g, Consolidation)",c:"Fromage (réintroduction)",k:410,pr:28,gl:0,li:33,p:4},
+  {n:"Mozzarella (30 g, Consolidation)",c:"Fromage (réintroduction)",k:280,pr:22,gl:2,li:22,p:4},
 
   // ═══ Ajouts : Déclinaisons aromatisées des laitages 0% (sans sucre) ═══
-  {n:"Skyr à la mangue 0%",c:"Laitage 0%",k:70,pr:9,p:1},{n:"Skyr à la fraise 0%",c:"Laitage 0%",k:66,pr:9.5,p:1},
-  {n:"Skyr à la vanille 0%",c:"Laitage 0%",k:68,pr:10,p:1},{n:"Skyr au citron 0%",c:"Laitage 0%",k:65,pr:10,p:1},
-  {n:"Skyr à la pêche 0%",c:"Laitage 0%",k:68,pr:9.5,p:1},{n:"Skyr aux fruits rouges 0%",c:"Laitage 0%",k:67,pr:9.5,p:1},
-  {n:"Skyr à la myrtille 0%",c:"Laitage 0%",k:68,pr:9.5,p:1},{n:"Skyr au café 0%",c:"Laitage 0%",k:65,pr:10,p:1},
-  {n:"Yaourt à la vanille 0% (sans sucre)",c:"Laitage 0%",k:46,pr:4.8,p:1},{n:"Yaourt au citron 0% (sans sucre)",c:"Laitage 0%",k:44,pr:4.8,p:1},
-  {n:"Yaourt à la fraise 0% (sans sucre)",c:"Laitage 0%",k:47,pr:4.6,p:1},{n:"Yaourt à la pêche 0% (sans sucre)",c:"Laitage 0%",k:47,pr:4.6,p:1},
-  {n:"Yaourt à la noix de coco 0% (sans sucre)",c:"Laitage 0%",k:50,pr:4.5,p:1},{n:"Yaourt au café 0% (sans sucre)",c:"Laitage 0%",k:45,pr:4.8,p:1},
-  {n:"Yaourt à la framboise 0% (sans sucre)",c:"Laitage 0%",k:47,pr:4.6,p:1},{n:"Yaourt à l'abricot 0% (sans sucre)",c:"Laitage 0%",k:48,pr:4.5,p:1},
-  {n:"Fromage blanc à la vanille 0% (sans sucre)",c:"Laitage 0%",k:55,pr:7.5,p:1},{n:"Fromage blanc aux fruits rouges 0% (sans sucre)",c:"Laitage 0%",k:58,pr:7,p:1},
-  {n:"Fromage blanc au citron 0% (sans sucre)",c:"Laitage 0%",k:55,pr:7.5,p:1},{n:"Fromage blanc à la mangue 0% (sans sucre)",c:"Laitage 0%",k:58,pr:7,p:1},
-  {n:"Petits-suisses à la vanille 0% (sans sucre)",c:"Laitage 0%",k:55,pr:7.5,p:1},{n:"Petits-suisses aux fruits 0% (sans sucre)",c:"Laitage 0%",k:58,pr:7,p:1},
-  {n:"Yaourt à la grecque citron 0%",c:"Laitage 0%",k:58,pr:6.8,p:1},{n:"Yaourt à la grecque vanille 0%",c:"Laitage 0%",k:60,pr:6.8,p:1},
-  {n:"Yaourt à boire à la fraise 0%",c:"Laitage 0%",k:48,pr:3.3,p:1},{n:"Yaourt à boire à la pêche 0%",c:"Laitage 0%",k:48,pr:3.3,p:1},
-  {n:"Kéfir de lait à la vanille 0%",c:"Laitage 0%",k:42,pr:3.5,p:1},
+  {n:"Skyr à la mangue 0%",c:"Laitage 0%",k:70,pr:9,gl:8,li:0.2,p:1},{n:"Skyr à la fraise 0%",c:"Laitage 0%",k:66,pr:9.5,gl:7,li:0.2,p:1},
+  {n:"Skyr à la vanille 0%",c:"Laitage 0%",k:68,pr:10,gl:6,li:0.2,p:1},{n:"Skyr au citron 0%",c:"Laitage 0%",k:65,pr:10,gl:5,li:0.2,p:1},
+  {n:"Skyr à la pêche 0%",c:"Laitage 0%",k:68,pr:9.5,gl:7,li:0.2,p:1},{n:"Skyr aux fruits rouges 0%",c:"Laitage 0%",k:67,pr:9.5,gl:7,li:0.2,p:1},
+  {n:"Skyr à la myrtille 0%",c:"Laitage 0%",k:68,pr:9.5,gl:7,li:0.2,p:1},{n:"Skyr au café 0%",c:"Laitage 0%",k:65,pr:10,gl:5,li:0.2,p:1},
+  {n:"Yaourt à la vanille 0% (sans sucre)",c:"Laitage 0%",k:46,pr:4.8,gl:6,li:0.2,p:1},{n:"Yaourt au citron 0% (sans sucre)",c:"Laitage 0%",k:44,pr:4.8,gl:5,li:0.2,p:1},
+  {n:"Yaourt à la fraise 0% (sans sucre)",c:"Laitage 0%",k:47,pr:4.6,gl:6,li:0.2,p:1},{n:"Yaourt à la pêche 0% (sans sucre)",c:"Laitage 0%",k:47,pr:4.6,gl:6,li:0.2,p:1},
+  {n:"Yaourt à la noix de coco 0% (sans sucre)",c:"Laitage 0%",k:50,pr:4.5,gl:6,li:0.5,p:1},{n:"Yaourt au café 0% (sans sucre)",c:"Laitage 0%",k:45,pr:4.8,gl:5,li:0.2,p:1},
+  {n:"Yaourt à la framboise 0% (sans sucre)",c:"Laitage 0%",k:47,pr:4.6,gl:6,li:0.2,p:1},{n:"Yaourt à l'abricot 0% (sans sucre)",c:"Laitage 0%",k:48,pr:4.5,gl:6,li:0.2,p:1},
+  {n:"Fromage blanc à la vanille 0% (sans sucre)",c:"Laitage 0%",k:55,pr:7.5,gl:5,li:0.2,p:1},{n:"Fromage blanc aux fruits rouges 0% (sans sucre)",c:"Laitage 0%",k:58,pr:7,gl:6,li:0.2,p:1},
+  {n:"Fromage blanc au citron 0% (sans sucre)",c:"Laitage 0%",k:55,pr:7.5,gl:5,li:0.2,p:1},{n:"Fromage blanc à la mangue 0% (sans sucre)",c:"Laitage 0%",k:58,pr:7,gl:6,li:0.2,p:1},
+  {n:"Petits-suisses à la vanille 0% (sans sucre)",c:"Laitage 0%",k:55,pr:7.5,gl:5,li:0.3,p:1},{n:"Petits-suisses aux fruits 0% (sans sucre)",c:"Laitage 0%",k:58,pr:7,gl:6,li:0.3,p:1},
+  {n:"Yaourt à la grecque citron 0%",c:"Laitage 0%",k:58,pr:6.8,gl:5,li:0.3,p:1},{n:"Yaourt à la grecque vanille 0%",c:"Laitage 0%",k:60,pr:6.8,gl:5,li:0.3,p:1},
+  {n:"Yaourt à boire à la fraise 0%",c:"Laitage 0%",k:48,pr:3.3,gl:6,li:0.3,p:1},{n:"Yaourt à boire à la pêche 0%",c:"Laitage 0%",k:48,pr:3.3,gl:6,li:0.3,p:1},
+  {n:"Kéfir de lait à la vanille 0%",c:"Laitage 0%",k:42,pr:3.5,gl:5,li:0.3,p:1},
 
   // ═══ Ajouts : Déclinaisons des compotes sans sucre ajouté (toléré) ═══
-  {n:"Compote de pomme sans sucre ajouté",c:"Toléré",k:48,pr:0.3,p:3},{n:"Compote de poire sans sucre ajouté",c:"Toléré",k:50,pr:0.3,p:3},
-  {n:"Compote pomme-fraise sans sucre ajouté",c:"Toléré",k:48,pr:0.3,p:3},{n:"Compote pomme-pêche sans sucre ajouté",c:"Toléré",k:48,pr:0.3,p:3},
-  {n:"Compote pomme-abricot sans sucre ajouté",c:"Toléré",k:50,pr:0.4,p:3},{n:"Compote de pruneau sans sucre ajouté",c:"Toléré",k:70,pr:0.6,p:3},
+  {n:"Compote de pomme sans sucre ajouté",c:"Toléré",k:48,pr:0.3,gl:12,li:0.2,p:3},{n:"Compote de poire sans sucre ajouté",c:"Toléré",k:50,pr:0.3,gl:13,li:0.2,p:3},
+  {n:"Compote pomme-fraise sans sucre ajouté",c:"Toléré",k:48,pr:0.3,gl:12,li:0.2,p:3},{n:"Compote pomme-pêche sans sucre ajouté",c:"Toléré",k:48,pr:0.3,gl:12,li:0.2,p:3},
+  {n:"Compote pomme-abricot sans sucre ajouté",c:"Toléré",k:50,pr:0.4,gl:13,li:0.2,p:3},{n:"Compote de pruneau sans sucre ajouté",c:"Toléré",k:70,pr:0.6,gl:18,li:0.2,p:3},
 
   // ═══ Ajouts : Déclinaisons infusions & thés ═══
-  {n:"Thé vert à la menthe",c:"Boisson",k:0,pr:0,p:1},{n:"Thé vert au citron",c:"Boisson",k:0,pr:0,p:1},
-  {n:"Tisane à la verveine",c:"Boisson",k:0,pr:0,p:1},{n:"Tisane au fenouil",c:"Boisson",k:0,pr:0,p:1}
+  {n:"Thé vert à la menthe",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1},{n:"Thé vert au citron",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1},
+  {n:"Tisane à la verveine",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1},{n:"Tisane au fenouil",c:"Boisson",k:0,pr:0,gl:0,li:0,p:1}
 ];
 
 /* ═══════════════════ ALIMENTS À ÉVITER ═══════════════════ */
@@ -1151,6 +1161,8 @@ function sortedWeights(){ return [...state.weights].sort((a,b)=>a.date<b.date?-1
 function currentWeight(){ const w=sortedWeights(); return w.length? w[w.length-1].poids : null; }
 function journalKcal(dateStr){ return (state.journal[dateStr]||[]).reduce((s,e)=>s+(+e.kcal||0),0); }
 function journalProtein(dateStr){ return (state.journal[dateStr]||[]).reduce((s,e)=>s+(+e.prot||0),0); }
+function journalGlucides(dateStr){ return Math.round((state.journal[dateStr]||[]).reduce((s,e)=>s+(+e.gluc||0),0)*10)/10; }
+function journalLipides(dateStr){ return Math.round((state.journal[dateStr]||[]).reduce((s,e)=>s+(+e.lip||0),0)*10)/10; }
 function proteinTarget(){ const w=currentWeight()||state.profile.depart; return w?Math.round(w):null; }
 function sportKcalDay(dateStr){ return state.sports.filter(s=>s.date===dateStr).reduce((s,e)=>s+(+e.kcal||0),0); }
 function stepsCount(dateStr){ return state.steps[dateStr]||0; }
@@ -1276,6 +1288,18 @@ function toast(msg){
 }
 
 /* ═══════════════════ GRAPHIQUE POIDS (SVG) ═══════════════════ */
+/* Convertit une liste de points [x,y] en chemin SVG lissé (spline Catmull-Rom → Bézier) */
+function smoothPath(pts){
+  if(pts.length<2) return "";
+  let d=`M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2;
+    const c1x=p1[0]+(p2[0]-p0[0])/6, c1y=p1[1]+(p2[1]-p0[1])/6;
+    const c2x=p2[0]-(p3[0]-p1[0])/6, c2y=p2[1]-(p3[1]-p1[1])/6;
+    d+=` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
 function renderWeightChart(container, height){
   const el = document.getElementById(container);
   const data = sortedWeights();
@@ -1292,11 +1316,16 @@ function renderWeightChart(container, height){
   const x0=Math.min(...xs), x1=Math.max(...xs);
   const X = t => padL + (t-x0)/(x1-x0||1)*(W-padL-padR);
   const Y = v => padT + (ymax-v)/(ymax-ymin)*(H-padT-padB);
-  // gridlines (4 horizontales)
-  let g="";
+  // gridlines (4 horizontales, pointillés discrets)
+  let g=`<defs>
+    <linearGradient id="${container}-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--series-1)" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="var(--series-1)" stop-opacity="0"/>
+    </linearGradient>
+  </defs>`;
   for(let i=0;i<=4;i++){
     const v=ymin+(ymax-ymin)*i/4, y=Y(v);
-    g+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--grid)" stroke-width="1"/>`;
+    g+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--grid)" stroke-width="1" stroke-dasharray="3 4"/>`;
     g+=`<text x="${padL-7}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-variant-numeric="tabular-nums">${v.toFixed(1)}</text>`;
   }
   // x labels (max 6)
@@ -1310,15 +1339,23 @@ function renderWeightChart(container, height){
     g+=`<line x1="${padL}" y1="${Y(cible)}" x2="${W-padR}" y2="${Y(cible)}" stroke="var(--series-2)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
     g+=`<text x="${W-padR}" y="${Y(cible)-5}" text-anchor="end" font-size="11" fill="var(--series-2)" font-weight="600">Objectif ${cible} kg</text>`;
   }
-  // courbe
-  const pts = data.map((d,i)=>X(xs[i]).toFixed(1)+","+Y(ys[i]).toFixed(1)).join(" ");
-  g+=`<polyline points="${pts}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  // courbe lissée + aire dégradée
+  const pts = data.map((d,i)=>[X(xs[i]),Y(ys[i])]);
+  const linePath = smoothPath(pts);
+  const baseY = H-padB;
+  const areaPath = `${linePath} L${pts[pts.length-1][0].toFixed(1)},${baseY} L${pts[0][0].toFixed(1)},${baseY} Z`;
+  g+=`<path d="${areaPath}" fill="url(#${container}-fill)" stroke="none"/>`;
+  g+=`<path d="${linePath}" fill="none" stroke="var(--series-1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
   data.forEach((d,i)=>{
-    g+=`<circle cx="${X(xs[i])}" cy="${Y(ys[i])}" r="3.5" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2"/>`;
+    if(i===data.length-1) return;
+    g+=`<circle cx="${X(xs[i])}" cy="${Y(ys[i])}" r="3" fill="var(--surface-1)" stroke="var(--series-1)" stroke-width="2"/>`;
   });
-  // dernier point : étiquette directe
+  // dernier point : marqueur mis en valeur + étiquette directe
   const last=data[data.length-1];
-  g+=`<text x="${X(xs[xs.length-1])-8}" y="${Y(last.poids)-10}" text-anchor="end" font-size="12" font-weight="700" fill="var(--ink)">${last.poids} kg</text>`;
+  const lx=X(xs[xs.length-1]), ly=Y(last.poids);
+  g+=`<circle cx="${lx}" cy="${ly}" r="8" fill="var(--series-1)" opacity="0.16"/>`;
+  g+=`<circle cx="${lx}" cy="${ly}" r="4.5" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2.5"/>`;
+  g+=`<text x="${lx-10}" y="${ly-12}" text-anchor="end" font-size="12.5" font-weight="700" fill="var(--ink)">${last.poids} kg</text>`;
   el.innerHTML = `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">${g}
     <line id="${container}-cross" x1="0" y1="${padT}" x2="0" y2="${H-padB}" stroke="var(--baseline)" stroke-width="1" style="display:none"/>
   </svg><div class="chart-tip" id="${container}-tip"></div>`;
@@ -1364,7 +1401,7 @@ function renderBodyChart(container, height){
   let g="";
   for(let i=0;i<=3;i++){
     const v=ymin+(ymax-ymin)*i/3, y=Y(v);
-    g+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--grid)" stroke-width="1"/>`;
+    g+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--grid)" stroke-width="1" stroke-dasharray="3 4"/>`;
     g+=`<text x="${padL-7}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--muted)">${Math.round(v)}</text>`;
   }
   const step=Math.max(1,Math.ceil(data.length/6));
@@ -1375,8 +1412,8 @@ function renderBodyChart(container, height){
   function drawLine(key,color){
     const pts=data.map((d,i)=>d[key]?[X(xs[i]),Y(d[key])]:null).filter(Boolean);
     if(pts.length<2) return;
-    g+=`<polyline points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-    pts.forEach(p=>{ g+=`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="${color}" stroke="var(--surface-1)" stroke-width="2"/>`; });
+    g+=`<path d="${smoothPath(pts)}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    pts.forEach(p=>{ g+=`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(--surface-1)" stroke="${color}" stroke-width="2.5"/>`; });
   }
   drawLine("taille","var(--series-1)");
   drawLine("hanches","var(--series-3)");
@@ -1415,10 +1452,17 @@ function renderCalChart(){
   const max=Math.max(...eat,...burn,100)*1.12;
   const bw=(W-padL-padR)/days.length;
   const Y=v=>padT+(1-v/max)*(H-padT-padB);
-  let g="";
+  let g=`<defs>
+    <linearGradient id="calChart-eat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--series-1)" stop-opacity="1"/><stop offset="100%" stop-color="var(--series-1)" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="calChart-burn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--series-2)" stop-opacity="1"/><stop offset="100%" stop-color="var(--series-2)" stop-opacity="0.55"/>
+    </linearGradient>
+  </defs>`;
   for(let i=0;i<=3;i++){
     const v=max*i/3, y=Y(v);
-    g+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--grid)" stroke-width="1"/>`;
+    g+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--grid)" stroke-width="1" stroke-dasharray="3 4"/>`;
     g+=`<text x="${padL-7}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--muted)">${Math.round(v)}</text>`;
   }
   const bars=[];
@@ -1427,8 +1471,8 @@ function renderCalChart(){
     const w1=Math.min(22,bw*0.28);
     const x1=cx-w1-1, x2=cx+1;
     const h1=(H-padB)-Y(eat[i]), h2=(H-padB)-Y(burn[i]);
-    if(eat[i]>0) g+=`<rect x="${x1}" y="${Y(eat[i])}" width="${w1}" height="${Math.max(h1,2)}" rx="4" fill="var(--series-1)"/>`;
-    if(burn[i]>0) g+=`<rect x="${x2}" y="${Y(burn[i])}" width="${w1}" height="${Math.max(h2,2)}" rx="4" fill="var(--series-2)"/>`;
+    if(eat[i]>0) g+=`<rect x="${x1}" y="${Y(eat[i])}" width="${w1}" height="${Math.max(h1,2)}" rx="5" fill="url(#calChart-eat)"/>`;
+    if(burn[i]>0) g+=`<rect x="${x2}" y="${Y(burn[i])}" width="${w1}" height="${Math.max(h2,2)}" rx="5" fill="url(#calChart-burn)"/>`;
     g+=`<text x="${cx}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${fmtDM(d)}</text>`;
     bars.push({x:padL+bw*i,w:bw,d,eat:eat[i],burn:burn[i]});
   });
@@ -1543,6 +1587,7 @@ function renderDashboard(){
       .filter(x=>x[1]).map(x=>`${x[0]} : ${escapeHtml(x[1])}`).join(" · ")+`</p>`;
   }
   html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>🍽️ Repas notés :</strong> ${meals.length?meals.map(m=>escapeHtml(m.aliment)).join(", "):"aucun pour l'instant"}</p>`;
+  if(meals.length) html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>🥧 Macros :</strong> ${journalProtein(t)} g protéines · ${journalGlucides(t)} g glucides · ${journalLipides(t)} g lipides</p>`;
   html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>💧 Eau :</strong> ${waterCount(t)} verre(s) (~${(waterCount(t)*0.25).toFixed(2)} L)</p>`;
   html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>🏃 Sport :</strong> ${sports.length?sports.map(s=>escapeHtml(s.activite)+" ("+s.duree+" min)").join(", "):"aucune activité notée"}</p>`;
   html+=`<p style="font-size:13.5px"><strong>🚶 Pas :</strong> ${stepsCount(t)?stepsCount(t).toLocaleString("fr-FR")+" pas (~"+stepsKcal(t)+" kcal)":"aucun pas noté"}</p>`;
@@ -1648,12 +1693,14 @@ document.getElementById("foodForm").addEventListener("submit",e=>{
   const f=FOODS.find(f=>f.n.toLowerCase()===aliment.toLowerCase());
   if(isNaN(kcal)){ kcal=f?Math.round(f.k*(qte||100)/100):0; }
   const prot=f?Math.round(f.pr*(qte||100)/100*10)/10:0;
+  const gluc=f?Math.round(f.gl*(qte||100)/100*10)/10:0;
+  const lip=f?Math.round(f.li*(qte||100)/100*10)/10:0;
   const repas=document.getElementById("fRepas").value;
   if(editingFoodIndex!=null){
-    state.journal[journalDate][editingFoodIndex]={repas,aliment,qte,kcal,prot};
+    state.journal[journalDate][editingFoodIndex]={repas,aliment,qte,kcal,prot,gluc,lip};
     resetFoodEdit();
   } else {
-    (state.journal[journalDate] ||= []).push({repas,aliment,qte,kcal,prot});
+    (state.journal[journalDate] ||= []).push({repas,aliment,qte,kcal,prot,gluc,lip});
   }
   save(); toast("Aliment enregistré ✓");
   document.getElementById("fAliment").value=""; document.getElementById("fKcal").value="";
@@ -1710,13 +1757,57 @@ function renderJournal(){
   });
   document.getElementById("journalMeals").innerHTML=html;
   const tot=journalKcal(journalDate), sp=burnedKcalDay(journalDate), prot=journalProtein(journalDate), pt=proteinTarget();
+  const gluc=journalGlucides(journalDate), lip=journalLipides(journalDate);
   const dt=dayType(journalDate);
   document.getElementById("journalTotals").innerHTML=`
     <div class="card"><div class="label">Total consommé</div><div class="value">${tot} <small>kcal</small></div></div>
     <div class="card"><div class="label">Protéines</div><div class="value">${prot} <small>g</small></div>${pt?`<div class="sub">Repère ≈ ${pt} g/j (1 g/kg)</div>`:""}</div>
+    <div class="card"><div class="label">Glucides</div><div class="value">${gluc} <small>g</small></div></div>
+    <div class="card"><div class="label">Lipides</div><div class="value">${lip} <small>g</small></div></div>
     <div class="card"><div class="label">Brûlées (sport + pas)</div><div class="value">${sp} <small>kcal</small></div></div>
     <div class="card"><div class="label">Bilan net</div><div class="value">${tot-sp} <small>kcal</small></div></div>
     ${dt?`<div class="card"><div class="label">Type de jour Dukan</div><div class="value" style="font-size:19px">${dt}</div></div>`:""}`;
+  renderMacroChart(prot,gluc,lip);
+}
+/* ═══════════════════ GRAPHIQUE MACRONUTRIMENTS (donut SVG) ═══════════════════ */
+function renderMacroChart(prot,gluc,lip){
+  const panel=document.getElementById("macroPanel"), el=document.getElementById("macroChart");
+  const kProt=prot*4, kGluc=gluc*4, kLip=lip*9;
+  const totK=kProt+kGluc+kLip;
+  if(totK<=0){ panel.style.display="none"; return; }
+  panel.style.display="block";
+  const data=[
+    {label:"Protéines",grams:prot,kcal:kProt,color:"var(--series-1)"},
+    {label:"Glucides",grams:gluc,kcal:kGluc,color:"var(--series-3)"},
+    {label:"Lipides",grams:lip,kcal:kLip,color:"var(--critical)"}
+  ];
+  const R=70, CX=90, CY=90, SW=26;
+  const C=2*Math.PI*R;
+  let offset=0, arcs="";
+  data.forEach(d=>{
+    const frac=d.kcal/totK;
+    const len=frac*C;
+    arcs+=`<circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${d.color}" stroke-width="${SW}"
+      stroke-dasharray="${len.toFixed(1)} ${(C-len).toFixed(1)}" stroke-dashoffset="${(-offset).toFixed(1)}"
+      transform="rotate(-90 ${CX} ${CY})" stroke-linecap="butt"/>`;
+    offset+=len;
+  });
+  const legend=data.map(d=>{
+    const pct=totK?Math.round(d.kcal/totK*100):0;
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="width:11px;height:11px;border-radius:3px;background:${d.color};flex-shrink:0"></span>
+      <span style="font-size:13.5px;flex:1"><strong>${d.label}</strong> — ${d.grams} g</span>
+      <span style="font-size:12.5px;color:var(--muted)">${pct}%</span>
+    </div>`;
+  }).join("");
+  el.innerHTML=`<div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+    <svg width="180" height="180" viewBox="0 0 180 180" style="flex-shrink:0">
+      ${arcs}
+      <text x="${CX}" y="${CY-4}" text-anchor="middle" font-size="19" font-weight="700" fill="var(--ink)">${Math.round(totK)}</text>
+      <text x="${CX}" y="${CY+15}" text-anchor="middle" font-size="11" fill="var(--muted)">kcal (macros)</text>
+    </svg>
+    <div style="flex:1;min-width:180px">${legend}</div>
+  </div>`;
 }
 function delFood(i){
   const e=state.journal[journalDate][i];
@@ -1979,7 +2070,8 @@ function renderAliments(){
   const badge=p=>p===1?'<span class="badge p1">Dès l\'Attaque</span>':p===2?'<span class="badge p2">Dès la Croisière</span>':p===3?'<span class="badge p3">Toléré</span>':'<span class="badge p4">Réintroduction</span>';
   document.getElementById("foodGrid").innerHTML = list.length ? list.map(f=>`
     <div class="food-item p${f.p}">
-      <div><div class="fname">${f.n}</div><div class="fmeta">${f.c} · ${f.k} kcal · ${f.pr} g prot. /100 g</div></div>
+      <div><div class="fname">${f.n}</div><div class="fmeta">${f.c} · ${f.k} kcal /100 g</div>
+      <div class="fmacros"><span class="fm-p">P ${f.pr}g</span><span class="fm-g">G ${f.gl}g</span><span class="fm-l">L ${f.li}g</span></div></div>
       ${badge(f.p)}
     </div>`).join("") : '<p class="empty">Aucun aliment ne correspond à votre recherche.</p>';
 }
