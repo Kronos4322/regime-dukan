@@ -199,6 +199,7 @@
     padding:14px 16px;box-shadow:var(--shadow);transition:transform .15s ease,box-shadow .15s ease;
   }
   @media (hover:hover){ .card:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgba(11,11,11,.06),0 14px 26px rgba(11,11,11,.07)} }
+  .card.macro{border-top:3px solid var(--macro-color);padding-top:12px}
   .card .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
   .card .value{font-size:26px;font-weight:700;line-height:1.1}
   .card .value small{font-size:14px;font-weight:500;color:var(--ink-2)}
@@ -1180,7 +1181,7 @@ function dayType(dateStr){
 function sortedWeights(){ return [...state.weights].sort((a,b)=>a.date<b.date?-1:1); }
 function currentWeight(){ const w=sortedWeights(); return w.length? w[w.length-1].poids : null; }
 function journalKcal(dateStr){ return (state.journal[dateStr]||[]).reduce((s,e)=>s+(+e.kcal||0),0); }
-function journalProtein(dateStr){ return (state.journal[dateStr]||[]).reduce((s,e)=>s+(+e.prot||0),0); }
+function journalProtein(dateStr){ return Math.round((state.journal[dateStr]||[]).reduce((s,e)=>s+(+e.prot||0),0)*10)/10; }
 function journalGlucides(dateStr){ return Math.round((state.journal[dateStr]||[]).reduce((s,e)=>s+(+e.gluc||0),0)*10)/10; }
 function journalLipides(dateStr){ return Math.round((state.journal[dateStr]||[]).reduce((s,e)=>s+(+e.lip||0),0)*10)/10; }
 function proteinTarget(){ const w=currentWeight()||state.profile.depart; return w?Math.round(w):null; }
@@ -1589,7 +1590,7 @@ function renderDashboard(){
   cards.push({label:"IMC",value:v?v.toFixed(1):"—",sub:v?imcLabel(v):"Renseignez votre taille dans le profil"});
   cards.push({label:"Jour du régime",value:p.debut?String(daysBetween(p.debut,t)+1):"—",sub:p.debut?"depuis le "+fmtShort(p.debut):""});
   const rate=weeklyRate();
-  if(rate!=null) cards.push({label:"Rythme hebdo",value:(rate>=0?"+":"")+rate.toFixed(2)+" <small>kg/sem</small>",
+  if(rate!=null) cards.push({label:"Rythme hebdo",value:(rate>=0?"+":"")+rate.toFixed(1)+" <small>kg/sem</small>",
     sub:rate<-0.05?"📉 Perte de poids":rate>0.05?"📈 Prise de poids":"➖ Stable",
     cls:rate<-0.05?"good":rate>0.05?"bad":""});
   cards.push({label:"Aujourd'hui",value:journalKcal(t)+" <small>kcal</small>",sub:"🏃 "+burnedKcalDay(t)+" kcal brûlées"});
@@ -1613,7 +1614,7 @@ function renderDashboard(){
   }
   html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>🍽️ Repas notés :</strong> ${meals.length?meals.map(m=>escapeHtml(m.aliment)).join(", "):"aucun pour l'instant"}</p>`;
   if(meals.length) html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>🥧 Macros :</strong> ${journalProtein(t)} g protéines · ${journalGlucides(t)} g glucides · ${journalLipides(t)} g lipides</p>`;
-  html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>💧 Eau :</strong> ${waterCount(t)} verre(s) (~${(waterCount(t)*0.25).toFixed(2)} L)</p>`;
+  html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>💧 Eau :</strong> ${waterCount(t)} verre(s) (~${(waterCount(t)*0.25).toFixed(1)} L)</p>`;
   html+=`<p style="font-size:13.5px;margin-bottom:8px"><strong>🏃 Sport :</strong> ${sports.length?sports.map(s=>escapeHtml(s.activite)+" ("+s.duree+" min)").join(", "):"aucune activité notée"}</p>`;
   html+=`<p style="font-size:13.5px"><strong>🚶 Pas :</strong> ${stepsCount(t)?stepsCount(t).toLocaleString("fr-FR")+" pas (~"+stepsKcal(t)+" kcal)":"aucun pas noté"}</p>`;
   html+=`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
@@ -1656,7 +1657,7 @@ function renderBodyPanel(){
   renderBodyChart("bodyChartFull",230);
   const ratio=whr();
   document.getElementById("whrText").innerHTML = ratio
-    ? `Ratio tour de taille / tour de hanches : <strong>${ratio.toFixed(2)}</strong> — ${whrLabel(ratio)}. Repère indicatif de l'OMS, ne remplace pas un avis médical.`
+    ? `Ratio tour de taille / tour de hanches : <strong>${ratio.toFixed(1)}</strong> — ${whrLabel(ratio)}. Repère indicatif de l'OMS, ne remplace pas un avis médical.`
     : "Renseignez le tour de taille et le tour de hanches sur une même pesée pour calculer votre ratio.";
 }
 function renderPoids(){
@@ -1747,7 +1748,7 @@ function renderWater(){
   for(let i=1;i<=target;i++){
     html+=`<button class="water-glass ${i<=n?"filled":""}" aria-label="${i} verre(s) d'eau" onclick="setWaterClick(${i})">💧</button>`;
   }
-  html+=`</div><span style="font-size:13px;color:var(--ink-2)">${n}/${target} verres (~${(n*0.25).toFixed(2)} L)</span>`;
+  html+=`</div><span style="font-size:13px;color:var(--ink-2)">${n}/${target} verres (~${(n*0.25).toFixed(1)} L)</span>`;
   if(n>0) html+=`<button class="btn ghost small" onclick="setWaterClick(0)">Réinitialiser</button>`;
   html+="</div>";
   document.getElementById("waterTracker").innerHTML=html;
@@ -1786,9 +1787,9 @@ function renderJournal(){
   const dt=dayType(journalDate);
   document.getElementById("journalTotals").innerHTML=`
     <div class="card"><div class="label">Total consommé</div><div class="value">${tot} <small>kcal</small></div></div>
-    <div class="card"><div class="label">Protéines</div><div class="value">${prot} <small>g</small></div>${pt?`<div class="sub">Repère ≈ ${pt} g/j (1 g/kg)</div>`:""}</div>
-    <div class="card"><div class="label">Glucides</div><div class="value">${gluc} <small>g</small></div></div>
-    <div class="card"><div class="label">Lipides</div><div class="value">${lip} <small>g</small></div></div>
+    <div class="card macro" style="--macro-color:var(--series-1)"><div class="label">💪 Protéines</div><div class="value">${prot} <small>g</small></div>${pt?`<div class="sub">Repère ≈ ${pt} g/j (1 g/kg)</div>`:""}</div>
+    <div class="card macro" style="--macro-color:var(--series-3)"><div class="label">🌾 Glucides</div><div class="value">${gluc} <small>g</small></div></div>
+    <div class="card macro" style="--macro-color:var(--critical)"><div class="label">🥑 Lipides</div><div class="value">${lip} <small>g</small></div></div>
     <div class="card"><div class="label">Brûlées (sport + pas)</div><div class="value">${sp} <small>kcal</small></div></div>
     <div class="card"><div class="label">Bilan net</div><div class="value">${tot-sp} <small>kcal</small></div></div>
     ${dt?`<div class="card"><div class="label">Type de jour Dukan</div><div class="value" style="font-size:19px">${dt}</div></div>`:""}`;
