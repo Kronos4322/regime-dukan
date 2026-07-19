@@ -465,6 +465,16 @@
     <div id="progressSummary"></div>
   </div>
   <div class="panel">
+    <div class="datenav" style="margin-bottom:14px">
+      <h3 style="margin-bottom:0">📊 Bilans</h3>
+      <div class="segmented" style="margin-left:auto">
+        <button data-period="semaine" class="active">Semaine</button>
+        <button data-period="mois">Mois</button>
+      </div>
+    </div>
+    <div id="periodBody"></div>
+  </div>
+  <div class="panel">
     <h3>📉 Évolution du poids</h3>
     <div class="chart-wrap" id="weightChartDash"></div>
   </div>
@@ -1563,6 +1573,91 @@ function renderProgress(){
       ${items.map(it=>`<div class="card"><div class="label">${it.label}</div><div class="value">${it.value}</div></div>`).join("")}
     </div>`;
 }
+/* ═══════════════════ BILANS SEMAINE / MOIS ═══════════════════ */
+let dashPeriod="semaine";
+function periodRange(period){
+  const t=todayStr();
+  if(period==="semaine"){
+    const mon=mondayOf(t);
+    return {start:mon,end:addDays(mon,6)};
+  }
+  const d=strToDate(t), y=d.getFullYear(), m=d.getMonth();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const mm=String(m+1).padStart(2,"0");
+  return {start:`${y}-${mm}-01`, end:`${y}-${mm}-${String(daysInMonth).padStart(2,"0")}`};
+}
+function computePeriodStats(period){
+  const {start,end}=periodRange(period);
+  const t=todayStr();
+  const capEnd = end<t ? end : t;
+  const daysElapsed=Math.max(1,daysBetween(start,capEnd)+1);
+
+  const weightsInRange=sortedWeights().filter(w=>w.date>=start&&w.date<=end);
+  const avgWeight=weightsInRange.length?weightsInRange.reduce((s,w)=>s+w.poids,0)/weightsInRange.length:null;
+  const weightChange=weightsInRange.length>=2?weightsInRange[weightsInRange.length-1].poids-weightsInRange[0].poids:null;
+
+  let totalKcal=0,totalProt=0,totalGluc=0,totalLip=0,joursJournal=0,totalBurned=0,totalSteps=0,totalWaterGlasses=0,joursEau=0;
+  for(let d=start; d<=capEnd; d=addDays(d,1)){
+    if(state.journal[d]&&state.journal[d].length) joursJournal++;
+    totalKcal+=journalKcal(d); totalProt+=journalProtein(d); totalGluc+=journalGlucides(d); totalLip+=journalLipides(d);
+    totalBurned+=burnedKcalDay(d);
+    totalSteps+=stepsCount(d);
+    const w=waterCount(d); if(w>0){ totalWaterGlasses+=w; joursEau++; }
+  }
+  const sportsInRange=state.sports.filter(s=>s.date>=start&&s.date<=capEnd);
+  const totalMin=sportsInRange.reduce((s,e)=>s+(+e.duree||0),0);
+  const seances=sportsInRange.length;
+  let joursMenu=0;
+  for(let d=start; d<=end; d=addDays(d,1)){ if(state.menus[d]) joursMenu++; }
+
+  return {
+    daysElapsed, avgWeight, weightChange, pesees:weightsInRange.length,
+    totalKcal, avgKcal:totalKcal/daysElapsed, totalProt, avgProt:totalProt/daysElapsed,
+    totalGluc, avgGluc:totalGluc/daysElapsed, totalLip, avgLip:totalLip/daysElapsed, joursJournal,
+    totalMin, seances, totalBurned, totalSteps, avgSteps:totalSteps/daysElapsed,
+    totalWaterL:totalWaterGlasses*0.25, avgWaterL:(totalWaterGlasses*0.25)/daysElapsed, joursEau,
+    joursMenu
+  };
+}
+document.querySelectorAll('#page-dashboard .segmented button[data-period]').forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll('#page-dashboard .segmented button[data-period]').forEach(x=>x.classList.toggle("active",x===b));
+    dashPeriod=b.dataset.period; renderPeriodStats();
+  });
+});
+function renderPeriodStats(){
+  const s=computePeriodStats(dashPeriod);
+  const label=dashPeriod==="semaine"?"cette semaine":"ce mois-ci";
+  const card=(l,v)=>`<div class="card"><div class="label">${l}</div><div class="value">${v}</div></div>`;
+  let html="";
+  html+=`<h4 style="font-size:13px;color:var(--accent);margin:4px 0 8px">⚖️ Poids</h4><div class="cards" style="margin-bottom:14px">`;
+  html+=card("Poids moyen",s.avgWeight!=null?s.avgWeight.toFixed(1)+" kg":"—");
+  html+=card("Évolution",s.weightChange!=null?(s.weightChange>=0?"+":"")+s.weightChange.toFixed(1)+" kg":"—");
+  html+=card("Pesées "+label,String(s.pesees));
+  html+="</div>";
+  html+=`<h4 style="font-size:13px;color:var(--accent);margin:4px 0 8px">🍽️ Alimentation</h4><div class="cards" style="margin-bottom:14px">`;
+  html+=card("Calories totales",Math.round(s.totalKcal)+" kcal");
+  html+=card("Moy. calories/jour",Math.round(s.avgKcal)+" kcal");
+  html+=card("Moy. protéines/j",s.avgProt.toFixed(1)+" g");
+  html+=card("Moy. glucides/j",s.avgGluc.toFixed(1)+" g");
+  html+=card("Moy. lipides/j",s.avgLip.toFixed(1)+" g");
+  html+=card("Jours de journal",s.joursJournal+" / "+s.daysElapsed);
+  html+="</div>";
+  html+=`<h4 style="font-size:13px;color:var(--accent);margin:4px 0 8px">🏃 Sport &amp; activité</h4><div class="cards" style="margin-bottom:14px">`;
+  html+=card("Minutes de sport",String(s.totalMin));
+  html+=card("Séances",String(s.seances));
+  html+=card("Calories brûlées",Math.round(s.totalBurned)+" kcal");
+  html+=card("Pas totaux",Math.round(s.totalSteps).toLocaleString("fr-FR"));
+  html+=card("Moy. pas/jour",Math.round(s.avgSteps).toLocaleString("fr-FR"));
+  html+="</div>";
+  html+=`<h4 style="font-size:13px;color:var(--accent);margin:4px 0 8px">💧 Hydratation &amp; menus</h4><div class="cards" style="margin-bottom:0">`;
+  html+=card("Eau totale",s.totalWaterL.toFixed(1)+" L");
+  html+=card("Moy. eau/jour",s.avgWaterL.toFixed(1)+" L");
+  html+=card("Jours d'eau notée",s.joursEau+" / "+s.daysElapsed);
+  html+=card("Jours de menus planifiés",String(s.joursMenu));
+  html+="</div>";
+  document.getElementById("periodBody").innerHTML=html;
+}
 function renderDashboard(){
   const p=state.profile, w=currentWeight(), t=todayStr();
   // bannière du jour
@@ -1602,6 +1697,7 @@ function renderDashboard(){
     `<div class="card"><div class="label">${c.label}</div><div class="value">${c.value}</div>
      ${c.sub?`<div class="sub ${c.cls||""}">${c.sub}</div>`:""}</div>`).join("");
   renderProgress();
+  renderPeriodStats();
   renderWeightChart("weightChartDash",210);
   renderCalChart();
   // aujourd'hui : menu + repas + sport
