@@ -47,6 +47,7 @@
     --badge-p2-bg:#e2f6ee; --badge-p2-fg:#0e6e4c;
     --badge-p3-bg:#fdf3dd; --badge-p3-fg:#8a5d00;
     --badge-p4-bg:#f1ecfd; --badge-p4-fg:#6b3fa0;
+    --badge-p5-bg:#efece7; --badge-p5-fg:#6b5744;
     --badge-x-bg:#fbeaea; --badge-x-fg:#a83232;
     --shadow: 0 1px 2px rgba(11,11,11,.04), 0 6px 16px rgba(11,11,11,.05);
   }
@@ -76,6 +77,7 @@
       --badge-p2-bg:#0f2e22; --badge-p2-fg:#5cd9a8;
       --badge-p3-bg:#3a2f12; --badge-p3-fg:#f0c419;
       --badge-p4-bg:#2a1f45; --badge-p4-fg:#c9a6f2;
+      --badge-p5-bg:#332b22; --badge-p5-fg:#d9b98a;
       --badge-x-bg:#3a1f1f; --badge-x-fg:#e88a8a;
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 16px rgba(0,0,0,.35);
     }
@@ -93,6 +95,7 @@
     --badge-p2-bg:#0f2e22; --badge-p2-fg:#5cd9a8;
     --badge-p3-bg:#3a2f12; --badge-p3-fg:#f0c419;
     --badge-p4-bg:#2a1f45; --badge-p4-fg:#c9a6f2;
+    --badge-p5-bg:#332b22; --badge-p5-fg:#d9b98a;
     --badge-x-bg:#3a1f1f; --badge-x-fg:#e88a8a;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 16px rgba(0,0,0,.35);
   }
@@ -109,6 +112,7 @@
     --badge-p2-bg:#e2f6ee; --badge-p2-fg:#0e6e4c;
     --badge-p3-bg:#fdf3dd; --badge-p3-fg:#8a5d00;
     --badge-p4-bg:#f1ecfd; --badge-p4-fg:#6b3fa0;
+    --badge-p5-bg:#efece7; --badge-p5-fg:#6b5744;
     --badge-x-bg:#fbeaea; --badge-x-fg:#a83232;
     --shadow: 0 1px 2px rgba(11,11,11,.04), 0 6px 16px rgba(11,11,11,.05);
   }
@@ -328,6 +332,7 @@
   .food-item.p2{border-left-color:var(--badge-p2-fg)}
   .food-item.p3{border-left-color:var(--badge-p3-fg)}
   .food-item.p4{border-left-color:var(--badge-p4-fg)}
+  .food-item.p5{border-left-color:var(--badge-p5-fg)}
   .food-item .fname{font-size:13.5px;font-weight:600}
   .food-item .fmeta{font-size:11.5px;color:var(--muted)}
   .food-item .fmacros{display:flex;gap:7px;margin-top:4px}
@@ -340,6 +345,7 @@
   .badge.p2{background:var(--badge-p2-bg);color:var(--badge-p2-fg)}
   .badge.p3{background:var(--badge-p3-bg);color:var(--badge-p3-fg)}
   .badge.p4{background:var(--badge-p4-bg);color:var(--badge-p4-fg)}
+  .badge.p5{background:var(--badge-p5-bg);color:var(--badge-p5-fg)}
   .badge.x{background:var(--badge-x-bg);color:var(--badge-x-fg)}
   .phase-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
   .phase-card{border:1px solid var(--grid);border-radius:10px;padding:14px;background:var(--surface-2)}
@@ -590,12 +596,13 @@
       <div class="field"><label for="sActivite">Activité</label>
         <select id="sActivite"></select>
       </div>
+      <div class="field" id="sDistanceField" style="display:none"><label for="sDistance">Distance (km)</label><input type="number" id="sDistance" min="0" max="300" step="0.1" placeholder="ex : 15"></div>
       <div class="field"><label for="sDuree">Durée (min)</label><input type="number" id="sDuree" min="1" max="600" value="30" required></div>
       <div class="field"><label for="sKcal">Calories brûlées</label><input type="number" id="sKcal" min="0" max="5000" placeholder="auto"></div>
       <button class="btn" type="submit" id="sportSubmitBtn">Enregistrer</button>
     </form>
     <p style="font-size:12.5px;color:var(--muted);margin-top:6px">
-      💡 Les calories sont estimées automatiquement selon l'activité, la durée et votre poids actuel.
+      💡 Les calories sont estimées automatiquement selon l'activité, la durée (ou la distance à vélo) et votre poids actuel.
     </p>
   </div>
   <div class="cards" id="sportCards"></div>
@@ -634,6 +641,7 @@
         <option value="2">Dès la Croisière (légumes)</option>
         <option value="3">Tolérés (max 2/jour)</option>
         <option value="4">Réintroductions (Consolidation/Stabilisation)</option>
+        <option value="5">Hors régime (repas libre, occasionnel)</option>
       </select>
     </div>
     <div class="food-grid" id="foodGrid"></div>
@@ -1032,6 +1040,16 @@ const FOODS = [
   {n:"Comté (30 g, Consolidation)",c:"Fromage (réintroduction)",k:410,pr:28,gl:0,li:33,p:4},
   {n:"Mozzarella (30 g, Consolidation)",c:"Fromage (réintroduction)",k:280,pr:22,gl:2,li:22,p:4},
 
+  // ═══ Ajouts : Repas libres / hors régime (pour un suivi calorique complet, à consommer occasionnellement) ═══
+  {n:"Rôti de porc",c:"Viande (hors régime)",k:220,pr:26,gl:0,li:12,p:5},
+  {n:"Rôti de dinde",c:"Volaille (hors régime)",k:150,pr:27,gl:0,li:4,p:5},
+  {n:"Pommes de terre vapeur",c:"Féculent (hors régime)",k:80,pr:2,gl:17,li:0.1,p:5},
+  {n:"Lardons",c:"Charcuterie (hors régime)",k:280,pr:22,gl:0,li:21,p:5},
+  {n:"Saucisson sec",c:"Charcuterie (hors régime)",k:410,pr:24,gl:1,li:35,p:5},
+  {n:"Pâté de campagne",c:"Charcuterie (hors régime)",k:320,pr:13,gl:2,li:29,p:5},
+  {n:"Betteraves marinées (vinaigrette)",c:"Légume (hors régime)",k:65,pr:1.3,gl:9,li:3,p:5},
+  {n:"Oignons grelots au vinaigre",c:"Légume (hors régime)",k:35,pr:1,gl:7,li:0.1,p:5},
+
   // ═══ Ajouts : Déclinaisons aromatisées des laitages 0% (sans sucre) ═══
   {n:"Skyr à la mangue 0%",c:"Laitage 0%",k:70,pr:9,gl:8,li:0.2,p:1},{n:"Skyr à la fraise 0%",c:"Laitage 0%",k:66,pr:9.5,gl:7,li:0.2,p:1},
   {n:"Skyr à la vanille 0%",c:"Laitage 0%",k:68,pr:10,gl:6,li:0.2,p:1},{n:"Skyr au citron 0%",c:"Laitage 0%",k:65,pr:10,gl:5,li:0.2,p:1},
@@ -1098,7 +1116,9 @@ const FORBIDDEN = [
 /* ═══════════════════ ACTIVITÉS SPORTIVES (MET) ═══════════════════ */
 const SPORTS = [
   {n:"Marche (rythme normal)",met:3.5},{n:"Marche rapide",met:5},
-  {n:"Course à pied (footing)",met:9},{n:"Vélo / vélo d'appartement",met:7},
+  {n:"Course à pied (footing)",met:9},{n:"Vélo d'appartement",met:7},
+  {n:"Vélo (route/VTT, sans assistance)",met:7.5,distSpeed:18},
+  {n:"Vélo à assistance électrique (VAE)",met:4,distSpeed:20},
   {n:"Natation",met:7},{n:"Aquagym",met:5.5},
   {n:"Musculation / renforcement",met:5},{n:"Fitness / cardio",met:7},
   {n:"Danse",met:5.5},{n:"Yoga / Pilates",met:3},
@@ -1263,6 +1283,11 @@ function complianceWarnings(dateStr){
   }
   const forbidden=entries.filter(e=>FORBIDDEN.some(f=>f.n.toLowerCase()===e.aliment.toLowerCase()));
   if(forbidden.length) warnings.push("🚫 Aliment(s) habituellement déconseillé(s) dans le Dukan : "+forbidden.map(v=>escapeHtml(v.aliment)).join(", "));
+  const horsRegime=entries.filter(e=>{
+    const f=FOODS.find(f=>f.n.toLowerCase()===e.aliment.toLowerCase());
+    return f && f.p===5;
+  });
+  if(horsRegime.length) warnings.push("🍽️ Repas libre noté (hors régime, à consommer occasionnellement) : "+horsRegime.map(v=>escapeHtml(v.aliment)).join(", "));
   return warnings;
 }
 
@@ -1933,30 +1958,49 @@ function autoSportKcal(){
   const min=parseFloat(document.getElementById("sDuree").value)||0;
   if(s&&min) document.getElementById("sKcal").value=sportKcal(s.met,min);
 }
-sSel.addEventListener("change",autoSportKcal);
+function toggleDistanceField(){
+  const s=SPORTS[+sSel.value];
+  const field=document.getElementById("sDistanceField");
+  field.style.display = s&&s.distSpeed ? "flex" : "none";
+  if(!s||!s.distSpeed) document.getElementById("sDistance").value="";
+}
+function autoDurationFromDistance(){
+  const s=SPORTS[+sSel.value];
+  const dist=parseFloat(document.getElementById("sDistance").value);
+  if(s&&s.distSpeed&&dist>0){
+    document.getElementById("sDuree").value=Math.round(dist/s.distSpeed*60);
+    autoSportKcal();
+  }
+}
+sSel.addEventListener("change",()=>{ toggleDistanceField(); autoSportKcal(); });
 document.getElementById("sDuree").addEventListener("input",autoSportKcal);
+document.getElementById("sDistance").addEventListener("input",autoDurationFromDistance);
+toggleDistanceField();
 document.getElementById("sportForm").addEventListener("submit",e=>{
   e.preventDefault();
   const date=document.getElementById("sDate").value;
   const s=SPORTS[+sSel.value];
   const duree=parseFloat(document.getElementById("sDuree").value);
+  const distance=s.distSpeed?(parseFloat(document.getElementById("sDistance").value)||null):null;
   let kcal=parseFloat(document.getElementById("sKcal").value);
   if(isNaN(kcal)) kcal=sportKcal(s.met,duree);
   if(!date||!duree) return;
   if(editingSportIndex!=null){
-    state.sports[editingSportIndex]={date,activite:s.n,duree,kcal};
+    state.sports[editingSportIndex]={date,activite:s.n,duree,kcal,distance};
     resetSportEdit();
   } else {
-    state.sports.push({date,activite:s.n,duree,kcal});
+    state.sports.push({date,activite:s.n,duree,kcal,distance});
   }
   save(); toast("Activité enregistrée ✓");
-  document.getElementById("sKcal").value="";
+  document.getElementById("sKcal").value=""; document.getElementById("sDistance").value="";
   renderAll();
 });
 function editSport(i){
   const s=state.sports[i]; if(!s) return;
   document.getElementById("sDate").value=s.date;
   const idx=SPORTS.findIndex(x=>x.n===s.activite); if(idx>=0) sSel.value=idx;
+  toggleDistanceField();
+  if(s.distance) document.getElementById("sDistance").value=s.distance;
   document.getElementById("sDuree").value=s.duree;
   document.getElementById("sKcal").value=s.kcal;
   editingSportIndex=i;
@@ -2035,7 +2079,7 @@ function renderSport(){
   let rows=`<tr><th>Date</th><th>Activité</th><th class="num">Durée</th><th class="num">Calories</th><th></th></tr>`;
   data.forEach(s=>{
     const idx=state.sports.indexOf(s);
-    rows+=`<tr><td>${fmtShort(s.date)}</td><td>${escapeHtml(s.activite)}</td>
+    rows+=`<tr><td>${fmtShort(s.date)}</td><td>${escapeHtml(s.activite)}${s.distance?` <span style="color:var(--muted)">(${s.distance} km)</span>`:""}</td>
       <td class="num">${s.duree} min</td><td class="num"><strong>${s.kcal}</strong> kcal</td>
       <td style="white-space:nowrap"><button class="del" aria-label="Modifier ${escapeHtml(s.activite)} du ${fmtShort(s.date)}" onclick="editSport(${idx})">✏️</button><button class="del" aria-label="Supprimer ${escapeHtml(s.activite)} du ${fmtShort(s.date)}" onclick="delSport(${idx})">🗑️</button></td></tr>`;
   });
@@ -2067,7 +2111,7 @@ function renderAliments(){
   const cat=catSel.value, ph=document.getElementById("foodPhaseFilter").value;
   const list=FOODS.filter(f=>
     (!q||f.n.toLowerCase().includes(q))&&(!cat||f.c===cat)&&(!ph||String(f.p)===ph));
-  const badge=p=>p===1?'<span class="badge p1">Dès l\'Attaque</span>':p===2?'<span class="badge p2">Dès la Croisière</span>':p===3?'<span class="badge p3">Toléré</span>':'<span class="badge p4">Réintroduction</span>';
+  const badge=p=>p===1?'<span class="badge p1">Dès l\'Attaque</span>':p===2?'<span class="badge p2">Dès la Croisière</span>':p===3?'<span class="badge p3">Toléré</span>':p===4?'<span class="badge p4">Réintroduction</span>':'<span class="badge p5">Hors régime</span>';
   document.getElementById("foodGrid").innerHTML = list.length ? list.map(f=>`
     <div class="food-item p${f.p}">
       <div><div class="fname">${f.n}</div><div class="fmeta">${f.c} · ${f.k} kcal /100 g</div>
