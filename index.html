@@ -8,7 +8,10 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon-32.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-180.png">
-<meta name="theme-color" id="themeColorMeta" content="#2a78d6">
+<meta name="theme-color" id="themeColorMeta" content="#1f6f9c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,108 +27,121 @@
 <style>
   :root{
     color-scheme: light;
-    --surface-1:#fcfcfb;
+    --surface-1:#fffdf6;
     --surface-2:#ffffff;
-    --page:#f9f9f7;
-    --ink:#0b0b0b;
-    --ink-2:#52514e;
-    --muted:#898781;
-    --grid:#e1e0d9;
-    --baseline:#c3c2b7;
-    --border:rgba(11,11,11,0.10);
-    --series-1:#2a78d6;
-    --series-2:#1baf7a;
-    --series-3:#eda100;
-    --good:#006300;
-    --critical:#d03b3b;
-    --accent:#2a78d6;
-    --accent-hover:#1c5cab;
-    --accent-soft:#e7f0fb;
-    --info-fg:#184f95;
-    --info-border:#b7d3f6;
-    --badge-p1-bg:#e7f0fb; --badge-p1-fg:#1c5cab;
-    --badge-p2-bg:#e2f6ee; --badge-p2-fg:#0e6e4c;
-    --badge-p3-bg:#fdf3dd; --badge-p3-fg:#8a5d00;
-    --badge-p4-bg:#f1ecfd; --badge-p4-fg:#6b3fa0;
-    --badge-p5-bg:#efece7; --badge-p5-fg:#6b5744;
-    --badge-x-bg:#fbeaea; --badge-x-fg:#a83232;
-    --shadow: 0 1px 2px rgba(11,11,11,.04), 0 6px 16px rgba(11,11,11,.05);
+    --page:#f8f4e9;
+    --ink:#1e2f3d;
+    --ink-2:#4d6270;
+    --muted:#8fa0ab;
+    --grid:#e6ddc4;
+    --baseline:#cdbf9a;
+    --border:rgba(30,47,61,0.10);
+    --series-1:#1f6f9c;
+    --series-2:#2e9b8f;
+    --series-3:#c19a3a;
+    --good:#3d7a4f;
+    --critical:#b8483d;
+    --accent:#1f6f9c;
+    --accent-hover:#155277;
+    --accent-soft:#e4f1f7;
+    --gold:#c19a3a;
+    --gold-soft:#f7edd2;
+    --info-fg:#155277;
+    --info-border:#bcdde9;
+    --badge-p1-bg:#e4f1f7; --badge-p1-fg:#155277;
+    --badge-p2-bg:#e1f3ef; --badge-p2-fg:#1f6e63;
+    --badge-p3-bg:#f7edd2; --badge-p3-fg:#8a6a1a;
+    --badge-p4-bg:#f0e8f5; --badge-p4-fg:#6a3f82;
+    --badge-p5-bg:#f3e9e2; --badge-p5-fg:#7a4f34;
+    --badge-x-bg:#f9e6e3; --badge-x-fg:#a13f2e;
+    --shadow: 0 1px 2px rgba(30,47,61,.05), 0 8px 20px rgba(30,47,61,.06);
   }
   @media (prefers-color-scheme: dark){
     :root:where(:not([data-theme="light"])){
       color-scheme: dark;
-      --surface-1:#1a1a19;
-      --surface-2:#232322;
-      --page:#0d0d0d;
-      --ink:#ffffff;
-      --ink-2:#c3c2b7;
-      --muted:#8f8d86;
-      --grid:#2c2c2a;
-      --baseline:#3a3a37;
-      --border:rgba(255,255,255,.10);
-      --series-1:#3987e5;
-      --series-2:#199e70;
-      --series-3:#c98500;
-      --good:#0ca30c;
-      --critical:#e66767;
-      --accent:#3987e5;
-      --accent-hover:#5aa3ef;
-      --accent-soft:#152a45;
-      --info-fg:#bcdcff;
-      --info-border:#2c4a72;
-      --badge-p1-bg:#152a45; --badge-p1-fg:#8fbdf2;
-      --badge-p2-bg:#0f2e22; --badge-p2-fg:#5cd9a8;
-      --badge-p3-bg:#3a2f12; --badge-p3-fg:#f0c419;
-      --badge-p4-bg:#2a1f45; --badge-p4-fg:#c9a6f2;
-      --badge-p5-bg:#332b22; --badge-p5-fg:#d9b98a;
-      --badge-x-bg:#3a1f1f; --badge-x-fg:#e88a8a;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 16px rgba(0,0,0,.35);
+      --surface-1:#142330;
+      --surface-2:#1a2c3a;
+      --page:#0b1620;
+      --ink:#f4ecd8;
+      --ink-2:#bcccd6;
+      --muted:#7891a0;
+      --grid:#22384a;
+      --baseline:#2d4a5e;
+      --border:rgba(244,236,216,.10);
+      --series-1:#5fb3dd;
+      --series-2:#4bc4ae;
+      --series-3:#e3c065;
+      --good:#6fc98a;
+      --critical:#e2836f;
+      --accent:#5fb3dd;
+      --accent-hover:#7ec3e6;
+      --accent-soft:#1a3446;
+      --gold:#e3c065;
+      --gold-soft:#3a3018;
+      --info-fg:#bfe3f5;
+      --info-border:#2a4e63;
+      --badge-p1-bg:#1a3446; --badge-p1-fg:#8fd0ef;
+      --badge-p2-bg:#133a32; --badge-p2-fg:#6fe0c8;
+      --badge-p3-bg:#3a3018; --badge-p3-fg:#f0c94a;
+      --badge-p4-bg:#2c2038; --badge-p4-fg:#d3a6e8;
+      --badge-p5-bg:#33261c; --badge-p5-fg:#e0b48c;
+      --badge-x-bg:#3a1f1a; --badge-x-fg:#f0917d;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 8px 20px rgba(0,0,0,.4);
     }
   }
   :root[data-theme="dark"]{
     color-scheme: dark;
-    --surface-1:#1a1a19; --surface-2:#232322; --page:#0d0d0d;
-    --ink:#ffffff; --ink-2:#c3c2b7; --muted:#8f8d86;
-    --grid:#2c2c2a; --baseline:#3a3a37; --border:rgba(255,255,255,.10);
-    --series-1:#3987e5; --series-2:#199e70; --series-3:#c98500;
-    --good:#0ca30c; --critical:#e66767;
-    --accent:#3987e5; --accent-hover:#5aa3ef; --accent-soft:#152a45;
-    --info-fg:#bcdcff; --info-border:#2c4a72;
-    --badge-p1-bg:#152a45; --badge-p1-fg:#8fbdf2;
-    --badge-p2-bg:#0f2e22; --badge-p2-fg:#5cd9a8;
-    --badge-p3-bg:#3a2f12; --badge-p3-fg:#f0c419;
-    --badge-p4-bg:#2a1f45; --badge-p4-fg:#c9a6f2;
-    --badge-p5-bg:#332b22; --badge-p5-fg:#d9b98a;
-    --badge-x-bg:#3a1f1f; --badge-x-fg:#e88a8a;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 16px rgba(0,0,0,.35);
+    --surface-1:#142330; --surface-2:#1a2c3a; --page:#0b1620;
+    --ink:#f4ecd8; --ink-2:#bcccd6; --muted:#7891a0;
+    --grid:#22384a; --baseline:#2d4a5e; --border:rgba(244,236,216,.10);
+    --series-1:#5fb3dd; --series-2:#4bc4ae; --series-3:#e3c065;
+    --good:#6fc98a; --critical:#e2836f;
+    --accent:#5fb3dd; --accent-hover:#7ec3e6; --accent-soft:#1a3446;
+    --gold:#e3c065; --gold-soft:#3a3018;
+    --info-fg:#bfe3f5; --info-border:#2a4e63;
+    --badge-p1-bg:#1a3446; --badge-p1-fg:#8fd0ef;
+    --badge-p2-bg:#133a32; --badge-p2-fg:#6fe0c8;
+    --badge-p3-bg:#3a3018; --badge-p3-fg:#f0c94a;
+    --badge-p4-bg:#2c2038; --badge-p4-fg:#d3a6e8;
+    --badge-p5-bg:#33261c; --badge-p5-fg:#e0b48c;
+    --badge-x-bg:#3a1f1a; --badge-x-fg:#f0917d;
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 8px 20px rgba(0,0,0,.4);
   }
   :root[data-theme="light"]{
     color-scheme: light;
-    --surface-1:#fcfcfb; --surface-2:#ffffff; --page:#f9f9f7;
-    --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
-    --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,.10);
-    --series-1:#2a78d6; --series-2:#1baf7a; --series-3:#eda100;
-    --good:#006300; --critical:#d03b3b;
-    --accent:#2a78d6; --accent-hover:#1c5cab; --accent-soft:#e7f0fb;
-    --info-fg:#184f95; --info-border:#b7d3f6;
-    --badge-p1-bg:#e7f0fb; --badge-p1-fg:#1c5cab;
-    --badge-p2-bg:#e2f6ee; --badge-p2-fg:#0e6e4c;
-    --badge-p3-bg:#fdf3dd; --badge-p3-fg:#8a5d00;
-    --badge-p4-bg:#f1ecfd; --badge-p4-fg:#6b3fa0;
-    --badge-p5-bg:#efece7; --badge-p5-fg:#6b5744;
-    --badge-x-bg:#fbeaea; --badge-x-fg:#a83232;
-    --shadow: 0 1px 2px rgba(11,11,11,.04), 0 6px 16px rgba(11,11,11,.05);
+    --surface-1:#fffdf6; --surface-2:#ffffff; --page:#f8f4e9;
+    --ink:#1e2f3d; --ink-2:#4d6270; --muted:#8fa0ab;
+    --grid:#e6ddc4; --baseline:#cdbf9a; --border:rgba(30,47,61,.10);
+    --series-1:#1f6f9c; --series-2:#2e9b8f; --series-3:#c19a3a;
+    --good:#3d7a4f; --critical:#b8483d;
+    --accent:#1f6f9c; --accent-hover:#155277; --accent-soft:#e4f1f7;
+    --gold:#c19a3a; --gold-soft:#f7edd2;
+    --info-fg:#155277; --info-border:#bcdde9;
+    --badge-p1-bg:#e4f1f7; --badge-p1-fg:#155277;
+    --badge-p2-bg:#e1f3ef; --badge-p2-fg:#1f6e63;
+    --badge-p3-bg:#f7edd2; --badge-p3-fg:#8a6a1a;
+    --badge-p4-bg:#f0e8f5; --badge-p4-fg:#6a3f82;
+    --badge-p5-bg:#f3e9e2; --badge-p5-fg:#7a4f34;
+    --badge-x-bg:#f9e6e3; --badge-x-fg:#a13f2e;
+    --shadow: 0 1px 2px rgba(30,47,61,.05), 0 8px 20px rgba(30,47,61,.06);
+    --font-display:'Cinzel',"Times New Roman",serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-tap-highlight-color:transparent}
   body{
     font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
     background:
-      radial-gradient(1100px 520px at 12% -12%, var(--accent-soft), transparent 60%),
+      radial-gradient(1200px 560px at 14% -14%, var(--accent-soft), transparent 62%),
+      radial-gradient(900px 500px at 92% 8%, var(--gold-soft), transparent 55%),
       var(--page);
     color:var(--ink);
     min-height:100vh;font-size:15px;
     transition:background-color .2s ease,color .2s ease;
+  }
+  .greek-border{
+    height:9px;background-repeat:repeat-x;background-position:center;background-size:34px 17px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M0 15 H10 V5 H20 V15 H30 V5 H40' stroke='%23c19a3a' stroke-width='3' fill='none'/%3E%3C/svg%3E");
+    opacity:.8;
   }
   header{
     background:var(--surface-1);border-bottom:1px solid var(--grid);
@@ -133,7 +149,7 @@
     display:flex;align-items:center;gap:12px;flex-wrap:wrap;
     position:sticky;top:0;z-index:50;
   }
-  header h1{font-size:19px;font-weight:800;white-space:nowrap;letter-spacing:-.01em;cursor:pointer}
+  header h1{font-family:var(--font-display);font-size:19px;font-weight:700;white-space:nowrap;letter-spacing:.01em;cursor:pointer}
   header h1 span{color:var(--accent)}
   .phase-pill{
     background:var(--accent-soft);color:var(--accent);
@@ -187,12 +203,36 @@
     main{padding-bottom:calc(76px + env(safe-area-inset-bottom)) !important}
   }
 
+  /* ── Navigation latérale (bureau) ── */
+  .sidebar-brand{display:none}
+  @media (min-width:769px){
+    header{margin-left:236px}
+    header h1{display:none}
+    .greek-border{margin-left:236px}
+    main{margin-left:236px !important}
+    .top-nav{
+      display:flex;flex-direction:column;position:fixed;left:0;top:0;height:100vh;width:236px;
+      padding:20px 14px;gap:2px;overflow-y:auto;border-bottom:none;border-right:1px solid var(--grid);
+      z-index:55;background:var(--surface-1);
+    }
+    .sidebar-brand{
+      display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:18px;font-weight:700;
+      color:var(--ink);padding:2px 10px 18px;cursor:pointer;letter-spacing:.01em;
+    }
+    .sidebar-brand span{color:var(--accent)}
+    .top-nav .nav-btn{
+      text-align:left;border-radius:10px;border-bottom:none;border-left:3px solid transparent;
+      padding:11px 12px;display:flex;align-items:center;gap:2px;
+    }
+    .top-nav .nav-btn.active{border-left-color:var(--gold);border-bottom-color:transparent}
+  }
+
   main{max-width:1060px;margin:0 auto;padding:20px 16px 60px}
   .page{display:none}
   .page.active{display:block;animation:fadeIn .28s ease}
   @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   h2{font-size:17px;margin-bottom:14px}
-  h3{font-size:15px;margin-bottom:10px}
+  h3{font-family:var(--font-display);font-size:16px;font-weight:600;margin-bottom:10px;letter-spacing:.01em}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
   .card{
     background:var(--surface-1);border:1px solid var(--border);border-radius:14px;
@@ -220,7 +260,7 @@
     content:"";position:absolute;inset:0;pointer-events:none;
     background:radial-gradient(circle at 88% -15%,rgba(255,255,255,.28),transparent 60%);
   }
-  .hero-greeting{font-size:22px;font-weight:800;margin-bottom:3px;position:relative}
+  .hero-greeting{font-family:var(--font-display);font-size:23px;font-weight:700;margin-bottom:3px;position:relative;letter-spacing:.01em}
   .hero-date{font-size:13px;opacity:.88;text-transform:capitalize;margin-bottom:14px;position:relative}
   .hero-phase{
     display:inline-flex;align-items:center;background:rgba(255,255,255,.18);
@@ -288,7 +328,7 @@
     box-shadow:0 4px 14px rgba(11,11,11,.18);
   }
   .datenav{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-  .datenav .title{font-weight:700;font-size:16px;min-width:210px;text-transform:capitalize}
+  .datenav .title{font-family:var(--font-display);font-weight:600;font-size:17px;min-width:210px;text-transform:capitalize}
   .segmented{display:inline-flex;border:1px solid var(--baseline);border-radius:8px;overflow:hidden}
   .segmented button{
     background:none;border:none;padding:7px 14px;font-size:13px;cursor:pointer;color:var(--ink-2);font-family:inherit;
@@ -351,8 +391,19 @@
   .phase-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
   .phase-card{border:1px solid var(--grid);border-radius:10px;padding:14px;background:var(--surface-2)}
   .phase-card.current{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-  .phase-card h4{font-size:14px;margin-bottom:6px;color:var(--accent)}
-  .phase-card ul{padding-left:18px;font-size:13px;color:var(--ink-2);line-height:1.65}
+  .phase-card summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .phase-card summary::-webkit-details-marker{display:none}
+  .phase-card h4{font-family:var(--font-display);font-size:15px;margin-bottom:0;color:var(--accent);font-weight:600}
+  .phase-card ul{padding-left:18px;font-size:13px;color:var(--ink-2);line-height:1.65;margin-top:10px}
+  .chevron{color:var(--muted);transition:transform .2s ease;font-size:13px;flex-shrink:0}
+  details[open] .chevron{transform:rotate(180deg)}
+  .accordion{padding:0}
+  .accordion summary{
+    list-style:none;cursor:pointer;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  }
+  .accordion summary::-webkit-details-marker{display:none}
+  .accordion summary h3{margin-bottom:0}
+  .accordion .accordion-body{padding:0 18px 18px}
   .toast{
     position:fixed;bottom:22px;left:50%;transform:translate(-50%,10px);
     background:var(--ink);color:var(--page);padding:10px 20px;border-radius:10px;font-size:14px;
@@ -388,8 +439,10 @@
   <div class="header-spacer"></div>
   <button id="themeToggle" aria-label="Changer de thème" title="Changer de thème">🌙</button>
 </header>
+<div class="greek-border" aria-hidden="true"></div>
 
 <nav class="top-nav">
+  <div class="sidebar-brand" title="Retour à l'accueil" onclick="goToPage('accueil')">⚖️ Mon Régime <span>Dukan</span></div>
   <button class="nav-btn active" data-page="accueil">🏠 Accueil</button>
   <button class="nav-btn" data-page="dashboard">📊 Tableau de bord</button>
   <button class="nav-btn" data-page="poids">⚖️ Poids &amp; mesures</button>
@@ -701,14 +754,20 @@
           </select>
         </div>
         <div class="field"><label for="pDebutPhase">Début de la phase actuelle</label><input type="date" id="pDebutPhase"></div>
+      </div>
+      <div class="inline" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-top:12px">
+        <div class="field"><label for="pActivity">Niveau d'activité (hors sport noté)</label>
+          <select id="pActivity"></select>
+        </div>
         <button class="btn" type="submit">Enregistrer mon profil</button>
       </div>
     </form>
   </div>
 
   <div class="panel" id="bmrPanel" style="display:none">
-    <h3>🔬 Métabolisme de base (estimé)</h3>
-    <p style="font-size:13.5px;color:var(--ink-2)" id="bmrText"></p>
+    <h3>🔬 Métabolisme &amp; dépense énergétique</h3>
+    <div class="cards" id="bmrCards" style="margin-bottom:10px"></div>
+    <p style="font-size:12.5px;color:var(--muted)" id="bmrText"></p>
   </div>
 
   <div class="panel">
@@ -716,8 +775,9 @@
     <div class="phase-grid" id="phaseGrid"></div>
   </div>
 
-  <div class="panel">
-    <h3>📱 Installer l'application sur mon téléphone</h3>
+  <details class="panel accordion">
+    <summary><h3>📱 Installer l'application sur mon téléphone</h3><span class="chevron">⌄</span></summary>
+    <div class="accordion-body">
     <p style="font-size:13.5px;color:var(--ink-2);line-height:1.6">
       <strong>Android (Chrome) :</strong> ouvrez cette page sur votre téléphone, appuyez sur le menu ⋮ puis
       « Ajouter à l'écran d'accueil » / « Installer l'application ».<br>
@@ -725,22 +785,25 @@
       Une fois installée, l'application s'ouvre en plein écran comme une vraie appli, avec son icône.
       Pensez à sauvegarder régulièrement vos données dans l'onglet <strong>💾 Sauvegarde</strong>.
     </p>
-  </div>
+    </div>
+  </details>
 </section>
 
 <!-- ══════════ SAUVEGARDE ══════════ -->
 <section class="page" id="page-sauvegarde">
   <div class="warn-banner" id="backupReminder" style="display:none"></div>
 
-  <div class="panel">
-    <h3>💾 Pourquoi sauvegarder ?</h3>
+  <details class="panel accordion">
+    <summary><h3>💾 Pourquoi sauvegarder ?</h3><span class="chevron">⌄</span></summary>
+    <div class="accordion-body">
     <p style="font-size:13.5px;color:var(--ink-2);line-height:1.6">
       Toutes vos données (poids, repas, menus, sport) sont enregistrées <strong>uniquement dans ce navigateur, sur cet appareil</strong> —
       rien n'est envoyé sur un serveur. Si vous changez de téléphone, videz le cache, désinstallez l'application ou utilisez
       un autre navigateur, ces données <strong>ne vous suivront pas</strong> automatiquement. Exportez régulièrement une
       sauvegarde et gardez-la en lieu sûr (boîte mail, Drive, stockage cloud) pour ne jamais rien perdre.
     </p>
-  </div>
+    </div>
+  </details>
 
   <div class="panel">
     <h3>📊 Vos données actuelles</h3>
@@ -782,7 +845,7 @@
 /* ═══════════════════ DONNÉES & PERSISTANCE ═══════════════════ */
 const STORE_KEY = "dukan-app-v1";
 const defaultState = {
-  profile:{nom:"",sexe:"",taille:null,naissance:null,depart:null,cible:null,debut:"",phase:0,debutPhase:""},
+  profile:{nom:"",sexe:"",taille:null,naissance:null,depart:null,cible:null,debut:"",phase:0,debutPhase:"",activityLevel:"sedentaire"},
   weights:[],            // {date, poids, taille, hanches}
   journal:{},            // {"YYYY-MM-DD":[{repas, aliment, qte, kcal, prot}]}
   menus:{},              // {"YYYY-MM-DD":{pdj,dej,col,din}}
@@ -816,7 +879,7 @@ function updateThemeUI(){
   btn.textContent = eff==="dark" ? "☀️" : "🌙";
   btn.setAttribute("aria-label", eff==="dark" ? "Passer en mode clair" : "Passer en mode sombre");
   const meta = document.getElementById("themeColorMeta");
-  if(meta) meta.setAttribute("content", eff==="dark" ? "#3987e5" : "#2a78d6");
+  if(meta) meta.setAttribute("content", eff==="dark" ? "#5fb3dd" : "#1f6f9c");
 }
 document.getElementById("themeToggle").addEventListener("click", ()=>{
   const next = currentEffectiveTheme()==="dark" ? "light" : "dark";
@@ -1226,6 +1289,26 @@ function bmr(){
   if(!p.taille||!w||!age||!p.sexe) return null;
   const base=10*w+6.25*p.taille-5*age;
   return Math.round(p.sexe==="H"?base+5:base-161);
+}
+const ACTIVITY_LEVELS=[
+  {id:"sedentaire",label:"Sédentaire (peu ou pas d'exercice)",mult:1.2},
+  {id:"legere",label:"Légèrement actif (sport 1 à 3 j/semaine)",mult:1.375},
+  {id:"moderee",label:"Modérément actif (sport 3 à 5 j/semaine)",mult:1.55},
+  {id:"intense",label:"Très actif (sport 6 à 7 j/semaine)",mult:1.725}
+];
+document.getElementById("pActivity").innerHTML=ACTIVITY_LEVELS.map(l=>`<option value="${l.id}">${l.label}</option>`).join("");
+/* Dépense énergétique totale estimée = métabolisme de base × niveau d'activité (formule de Harris-Benedict) */
+function tdee(){
+  const b=bmr(); if(!b) return null;
+  const lvl=ACTIVITY_LEVELS.find(l=>l.id===state.profile.activityLevel)||ACTIVITY_LEVELS[0];
+  return {value:Math.round(b*lvl.mult), label:lvl.label};
+}
+/* Moyenne des calories réellement brûlées (sport + pas) sur les 7 derniers jours, pour comparaison */
+function observedBurn7j(){
+  const t=todayStr();
+  let total=0;
+  for(let i=0;i<7;i++) total+=burnedKcalDay(addDays(t,-i));
+  return Math.round(total/7);
 }
 /* Rythme hebdomadaire de perte de poids (comparaison sur ~7 jours glissants) */
 function weeklyRate(){
@@ -2244,6 +2327,7 @@ function fillProfil(){
   document.getElementById("pDebut").value=p.debut||"";
   document.getElementById("pPhase").value=p.phase||0;
   document.getElementById("pDebutPhase").value=p.debutPhase||"";
+  document.getElementById("pActivity").value=p.activityLevel||"sedentaire";
 }
 document.getElementById("profilForm").addEventListener("submit",e=>{
   e.preventDefault();
@@ -2257,23 +2341,33 @@ document.getElementById("profilForm").addEventListener("submit",e=>{
   p.debut=document.getElementById("pDebut").value;
   p.phase=parseInt(document.getElementById("pPhase").value)||0;
   p.debutPhase=document.getElementById("pDebutPhase").value;
+  p.activityLevel=document.getElementById("pActivity").value;
   save(); toast("Profil enregistré ✓"); renderAll();
 });
 function renderBmr(){
   const panel=document.getElementById("bmrPanel"), b=bmr(), age=currentAge();
   if(!b){ panel.style.display="none"; return; }
   panel.style.display="block";
+  const td=tdee(), obs=observedBurn7j();
+  document.getElementById("bmrCards").innerHTML=`
+    <div class="card"><div class="label">Métabolisme de base</div><div class="value">${b} <small>kcal/j</small></div><div class="sub">Énergie dépensée au repos (Mifflin-St Jeor)</div></div>
+    <div class="card"><div class="label">Dépense totale estimée</div><div class="value">${td.value} <small>kcal/j</small></div><div class="sub">${td.label}</div></div>
+    <div class="card"><div class="label">Dépense observée (7 j)</div><div class="value">${obs} <small>kcal/j</small></div><div class="sub">Moyenne sport + pas réellement notés</div></div>`;
   document.getElementById("bmrText").innerHTML=
-    `À ${age} ans, votre métabolisme de base est estimé à <strong>${b} kcal/jour</strong> `+
-    `(formule de Mifflin-St Jeor). C'est l'énergie que votre corps dépense au repos. `+
-    `Le régime Dukan ne repose pas sur le comptage des calories — cette estimation est purement indicative.`;
+    `À ${age} ans, votre métabolisme de base (l'énergie dépensée au repos) est estimé à <strong>${b} kcal/jour</strong>. `+
+    `En y ajoutant votre niveau d'activité déclaré, votre dépense totale estimée est d'environ <strong>${td.value} kcal/jour</strong>. `+
+    `La « dépense observée » compare ce chiffre à ce que le sport et les pas réellement notés cette semaine représentent — hors métabolisme de base. `+
+    `Le régime Dukan ne repose pas sur le comptage des calories : ces estimations restent purement indicatives.`;
 }
 function renderPhases(){
   document.getElementById("phaseGrid").innerHTML=PHASES.map(ph=>`
-    <div class="phase-card ${state.profile.phase===ph.id?"current":""}">
-      <h4>${ph.emoji} Phase ${ph.id} — ${ph.nom} ${state.profile.phase===ph.id?"· <em>en cours</em>":""}</h4>
+    <details class="phase-card ${state.profile.phase===ph.id?"current":""}" ${state.profile.phase===ph.id?"open":""}>
+      <summary>
+        <h4>${ph.emoji} Phase ${ph.id} — ${ph.nom} ${state.profile.phase===ph.id?"· <em>en cours</em>":""}</h4>
+        <span class="chevron">⌄</span>
+      </summary>
       <ul>${ph.regles.map(r=>`<li>${r}</li>`).join("")}</ul>
-    </div>`).join("");
+    </details>`).join("");
 }
 function backupStatus(){
   const hasData = state.weights.length || Object.keys(state.journal).length || state.sports.length;
